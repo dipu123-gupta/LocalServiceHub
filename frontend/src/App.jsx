@@ -55,7 +55,30 @@ import RefundPolicy from "./pages/RefundPolicy";
 import CancellationPolicy from "./pages/CancellationPolicy";
 import CityPage from "./pages/CityPage";
 
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "./store/authSlice";
+import { authService } from "./services/authService";
+
 function App() {
+  const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (userInfo) {
+        try {
+          await authService.getProfile();
+        } catch (error) {
+          if (error.response?.status === 401) {
+            dispatch(logout());
+          }
+        }
+      }
+    };
+    checkAuth();
+  }, [dispatch, userInfo]);
+
   usePushNotifications();
   return (
     <>

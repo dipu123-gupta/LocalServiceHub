@@ -2,13 +2,18 @@ import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  apiKey: "AIzaSyCiQ4H95XaTYbE1YZ5ielvgkgckm73eGMnk",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
+
+console.log("Firebase Init Config (Synced):", {
+  apiKey: firebaseConfig.apiKey,
+  projectId: firebaseConfig.projectId,
+});
 
 // Initialize Firebase only if projectId is present
 let app;
@@ -27,7 +32,7 @@ export const requestForToken = async () => {
   if (!messaging) return null;
   try {
     const currentToken = await getToken(messaging, {
-      vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+      vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY || undefined,
     });
     if (currentToken) {
       return currentToken;
