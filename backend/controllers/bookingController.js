@@ -591,7 +591,7 @@ const cancelBooking = asyncHandler(async (req, res) => {
     booking.status = "cancelled";
     
     // Refund if paid via wallet
-    if (booking.paymentMethod === "wallet" && booking.isPaid) {
+    if (booking.paymentMethod === "wallet" && booking.paymentStatus === "completed") {
       const wallet = await Wallet.findOne({ user: req.user._id }).session(session);
       if (wallet) {
         wallet.balance += booking.totalAmount;
