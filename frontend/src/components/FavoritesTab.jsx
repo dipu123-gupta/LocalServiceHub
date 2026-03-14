@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../services/api";
+import api from "@/utils/api";
 import { Heart, Star, Clock, MapPin, Loader2, ArrowRight, Sparkles, Bookmark } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "./common/Button";

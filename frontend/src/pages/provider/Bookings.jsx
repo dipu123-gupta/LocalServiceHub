@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import api from "../../services/api";
+import api from "@/utils/api";
 
 const Bookings = () => {
   const navigate = useNavigate();

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useSocket } from "../store/context/SocketContext";
-import api from "../services/api";
+import api from "@/utils/api";
 import { Bell, Check, CheckCheck, X, Sparkles, Inbox } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -30,7 +30,7 @@ const NotificationBell = () => {
         api.get("/notifications/unread"),
       ]);
       setNotifications(notifsRes.data);
-      setUnread(countRes.data.count);
+      setUnread(countRes.data.unreadCount);
     } catch (err) {
       console.error("Could not load notifications", err);
     }

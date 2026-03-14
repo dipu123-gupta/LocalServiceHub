@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import PageHeader from "../components/PageHeader";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, ShieldCheck, Tag, Info, Calendar, Loader2, CheckCircle, CheckCheck, Inbox, MessageSquare, Star, AlertCircle } from "lucide-react";
-import api from "../services/api";
+import api from "@/utils/api";
 import { useSelector } from "react-redux";
 
 const typeConfig = {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { X, Star, Send, Loader2, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import api from "../../services/api";
+import api from "@/utils/api";
 import Button from "../common/Button";
 
 const ReviewModal = ({ isOpen, onClose, booking, onSuccess }) => {

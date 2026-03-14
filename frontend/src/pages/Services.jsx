@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import api from "../services/api";
+import api from "@/utils/api";
 import ServiceCard from "../components/ServiceCard";
 import {
   Search,

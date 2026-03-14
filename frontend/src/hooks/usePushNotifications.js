@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import api from "../services/api";
+import api from "@/utils/api";
 import { requestForToken, onMessageListener } from "../utils/firebase.config";
 
 const usePushNotifications = () => {

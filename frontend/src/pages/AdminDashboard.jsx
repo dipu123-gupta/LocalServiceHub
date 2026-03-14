@@ -26,7 +26,7 @@ import AdminWithdrawalsTab from "../components/admin/AdminWithdrawalsTab";
 import AdminAnnouncementsTab from "../components/admin/AdminAnnouncementsTab";
 import AdminBookingsTab from "../components/admin/AdminBookingsTab";
 import AdminFinancialTab from "../components/admin/AdminFinancialTab";
-import api from "../services/api";
+import api from "@/utils/api";
 import Tabs from "../components/common/Tabs";
 import Button from "../components/common/Button";
 

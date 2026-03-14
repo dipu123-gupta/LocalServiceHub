@@ -15,7 +15,7 @@ import {
   Coins
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import api from "../services/api";
+import api from "@/utils/api";
 import { useSelector } from "react-redux";
 
 const Wallet = () => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../services/api";
+import api from "@/utils/api";
 import { 
   Loader2, 
   ChevronLeft, 
@@ -233,7 +233,7 @@ const PaymentPage = () => {
                         typeof booking?.service?.images?.[0] === "string"
                           ? booking.service.images[0]
                           : booking?.service?.images?.[0]?.url ||
-                            "https://via.placeholder.com/100"
+                             "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=100&auto=format&fit=crop"
                       }
                       className="w-full h-full object-cover"
                       alt="Service"

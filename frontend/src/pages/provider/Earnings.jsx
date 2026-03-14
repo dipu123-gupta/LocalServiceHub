@@ -16,7 +16,7 @@ import {
   History
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import api from "../../services/api";
+import api from "@/utils/api";
 import WithdrawalModal from "../../components/provider/WithdrawalModal";
 
 const Earnings = () => {

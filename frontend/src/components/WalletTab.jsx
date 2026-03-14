@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import api from "../services/api";
+import api from "@/utils/api";
 import {
   Wallet,
   Plus,
@@ -113,7 +113,7 @@ const WalletTab = ({ userInfo }) => {
       // Refresh transactions
       const tRes = await api.get("/wallet/transactions");
       setTransactions(tRes.data);
-      alert(`Success! ₹${amountToAdd} has been added to your wallet.`);
+      alert(`Success! ₹10 has been added to your wallet.`);
     } catch (err) {
       alert(err.extractedMessage || "Redemption failed");
     } finally {

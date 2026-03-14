@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Star, Clock, MapPin, Heart } from "lucide-react";
-import api from "../services/api";
+import api from "@/utils/api";
 import { setCredentials } from "../store/authSlice";
 import { useSocket } from "../store/context/SocketContext";
 import { useState, useEffect } from "react";

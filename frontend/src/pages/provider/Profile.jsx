@@ -21,7 +21,7 @@ import {
   FileUp,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import api from "../../services/api";
+import api from "@/utils/api";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, setCredentials } from "../../store/authSlice";
 import PasswordInput from "../../components/common/PasswordInput";

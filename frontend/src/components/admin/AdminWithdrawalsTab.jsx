@@ -1,4 +1,4 @@
-import api from "../../services/api";
+import api from "@/utils/api";
 import Button from "../common/Button";
 import Badge from "../common/Badge";
 import { useState } from "react";

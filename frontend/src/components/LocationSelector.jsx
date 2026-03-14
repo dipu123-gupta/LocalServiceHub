@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import api from "../services/api";
+import api from "@/utils/api";
 import axios from "axios";
 import { MapPin, ChevronDown, Check, Loader2, Navigation, Globe, Search, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -67,6 +67,7 @@ const LocationSelector = () => {
       async (position) => {
         try {
           const { latitude, longitude } = position.coords;
+          // Use a separate axios instance for external Nominatim API to avoid withCredentials/baseURL conflicts
           const res = await axios.get(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
           );

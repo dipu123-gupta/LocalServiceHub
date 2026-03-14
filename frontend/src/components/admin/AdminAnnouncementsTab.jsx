@@ -1,5 +1,5 @@
 import { Send, Loader2, Trash2, Megaphone, Users, User, UserCheck, Calendar, Radio } from "lucide-react";
-import api from "../../services/api";
+import api from "@/utils/api";
 import Button from "../common/Button";
 import Badge from "../common/Badge";
 import InputField from "../common/InputField";

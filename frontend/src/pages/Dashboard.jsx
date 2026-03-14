@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { setCredentials, logout } from "../store/authSlice";
-import api from "../services/api";
+import api from "@/utils/api";
 import {
   User,
   BookOpen,

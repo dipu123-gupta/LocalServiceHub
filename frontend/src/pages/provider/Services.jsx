@@ -17,7 +17,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import api from "../../services/api";
+import api from "@/utils/api";
 import ServiceModal from "../../components/provider/ServiceModal";
 
 const Services = () => {

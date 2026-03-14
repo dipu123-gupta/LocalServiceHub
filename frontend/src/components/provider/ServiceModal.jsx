@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Upload, Plus, Trash2, Loader2, IndianRupee, Clock, ChevronDown, CheckCircle2, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import api from "../../services/api";
+import api from "@/utils/api";
 
 const ServiceModal = ({ service, isOpen, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({

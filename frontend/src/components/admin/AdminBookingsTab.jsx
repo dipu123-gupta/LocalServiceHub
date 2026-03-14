@@ -1,7 +1,7 @@
 import { Calendar, Clock, User, Briefcase, MapPin, IndianRupee, Tag, Info, Trash2, CheckCircle, XCircle } from "lucide-react";
 import Badge from "../common/Badge";
 import Button from "../common/Button";
-import api from "../../services/api";
+import api from "@/utils/api";
 
 const AdminBookingsTab = ({ bookings = [], fetchAllData }) => {
   const handleDeleteBooking = async (id) => {

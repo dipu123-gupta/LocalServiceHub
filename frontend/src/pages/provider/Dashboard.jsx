@@ -13,7 +13,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { motion } from "framer-motion";
-import api from "../../services/api";
+import api from "@/utils/api";
 
 const Dashboard = () => {
   const navigate = useNavigate();

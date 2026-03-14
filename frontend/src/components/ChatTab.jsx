@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import api from "../services/api";
+import api from "@/utils/api";
 import {
   Send,
   User,

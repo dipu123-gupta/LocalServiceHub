@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { X, CreditCard, Loader2, IndianRupee, AlertCircle, CheckCircle2, Building, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import api from "../../services/api";
+import api from "@/utils/api";
 
 const WithdrawalModal = ({ isOpen, onClose, balance, onSuccess }) => {
   const [amount, setAmount] = useState("");

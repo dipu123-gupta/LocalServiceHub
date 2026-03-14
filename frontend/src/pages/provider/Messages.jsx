@@ -16,7 +16,7 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import api from "../../services/api";
+import api from "@/utils/api";
 import { useSelector } from "react-redux";
 import io from "socket.io-client";
 

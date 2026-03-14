@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import api from "../services/api";
+import api from "@/utils/api";
 import { Loader2, ChevronLeft, CreditCard, ShieldCheck, Zap, Sparkles, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import CheckoutForm from "../components/CheckoutForm";

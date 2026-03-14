@@ -1,5 +1,5 @@
 import { CheckCircle, XCircle, FileText, ExternalLink } from "lucide-react";
-import api from "../../services/api";
+import api from "@/utils/api";
 import Button from "../common/Button";
 import Badge from "../common/Badge";
 

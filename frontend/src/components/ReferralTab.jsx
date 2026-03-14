@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { Gift, Copy, Share2, CheckCircle, Users, Sparkles, ArrowRight, Wallet, BadgeCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "./common/Button";
-import api from "../services/api";
+import api from "@/utils/api";
 
 const ReferralTab = () => {
   const { userInfo } = useSelector((s) => s.auth);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import api from "../services/api";
+import api from "@/utils/api";
 import { 
   Check, 
   Loader2, 
