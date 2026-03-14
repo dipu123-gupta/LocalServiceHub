@@ -1,7 +1,9 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -32,8 +34,7 @@ import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 import announcementRoutes from "./routes/announcementRoutes.js";
 import settingRoutes from "./routes/settingRoutes.js";
 
-// Load env vars
-dotenv.config();
+//
 
 // Connect to database
 connectDB();
@@ -41,15 +42,25 @@ connectDB();
 const app = express();
 const httpServer = createServer(app);
 
+// Enable trust proxy for Render/Proxy environments
+// Enable trust proxy for Render/Proxy environments
+app.set("trust proxy", 1);
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://localservicehub-frontend.onrender.com",
+];
+
 // Socket.io setup
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
   transports: ["websocket", "polling"],
-  allowEIO3: true, // Allow older clients if necessary
+  allowEIO3: true,
 });
 
 // Attach io to app so controllers can emit events
@@ -63,11 +74,38 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
-app.use(helmet());
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://checkout.razorpay.com"],
+        connectSrc: [
+          "'self'",
+          "http://localhost:5000",
+          "ws://localhost:5000",
+          "https://firebaseinstallations.googleapis.com",
+          "https://fcmregistrations.googleapis.com",
+        ],
+        imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+      },
+    },
+  }),
+);
 app.use(morgan("dev"));
 app.use(cookieParser());
 

@@ -4,7 +4,7 @@ import User from "../models/User.js";
 const protect = async (req, res, next) => {
   let token;
 
-  token = req.cookies.jwt;
+  token = req.cookies.token;
 
   if (token) {
     try {
@@ -24,10 +24,11 @@ const protect = async (req, res, next) => {
 
       next();
     } catch (error) {
-      console.error(error);
+      console.error("Auth Middleware Error:", error.message);
       res.status(401).json({ message: "Not authorized, token failed" });
     }
   } else {
+    console.log("Auth Middleware: No token found in cookies");
     res.status(401).json({ message: "Not authorized, no token" });
   }
 };

@@ -5,6 +5,11 @@ export const getSocketId = (userId) => userSocketMap[userId];
 
 export const initSocket = (io) => {
   io.on("connection", (socket) => {
+    console.log("Socket connection attempt...", {
+      id: socket.id,
+      origin: socket.handshake.headers.origin,
+      query: socket.handshake.query
+    });
     const userId = socket.handshake.query.userId;
 
     if (userId && userId !== "undefined") {
