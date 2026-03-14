@@ -1,0 +1,143 @@
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import dotenv from "dotenv";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import cookieParser from "cookie-parser";
+import connectDB from "./config/db.js";
+import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
+import { initSocket } from "./services/socketService.js";
+import mongoSanitize from "express-mongo-sanitize";
+import xss from "xss-clean";
+import hpp from "hpp";
+import { apiLimiter, authLimiter } from "./middlewares/rateLimitMiddleware.js";
+
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import serviceRoutes from "./routes/serviceRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
+import walletRoutes from "./routes/walletRoutes.js";
+import couponRoutes from "./routes/couponRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
+import serviceProviderRoutes from "./routes/serviceProviderRoutes.js";
+import cityRoutes from "./routes/cityRoutes.js";
+import withdrawalRoutes from "./routes/withdrawalRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import subscriptionRoutes from "./routes/subscriptionRoutes.js";
+import announcementRoutes from "./routes/announcementRoutes.js";
+import settingRoutes from "./routes/settingRoutes.js";
+
+// Load env vars
+dotenv.config();
+
+// Connect to database
+connectDB();
+
+const app = express();
+const httpServer = createServer(app);
+
+// Socket.io setup
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+  transports: ["websocket", "polling"],
+  allowEIO3: true, // Allow older clients if necessary
+});
+
+// Attach io to app so controllers can emit events
+app.set("io", io);
+
+// Init socket handlers
+initSocket(io);
+
+// Middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    credentials: true,
+  }),
+);
+app.use(helmet());
+app.use(morgan("dev"));
+app.use(cookieParser());
+
+// Security Middlewares
+app.use(mongoSanitize()); // Prevent NoSQL Injection
+app.use(xss()); // Prevent XSS Attacks
+app.use(hpp()); // Prevent HTTP Parameter Pollution
+
+// Rate Limiting
+app.use("/api", apiLimiter); // Apply general API limits
+app.use("/api/auth", authLimiter); // Stricter limits for auth (Login/Register)
+
+// Diagnostic Middleware
+app.use((req, res, next) => {
+  console.log(`🔍 [${new Date().toISOString()}] ${req.method} ${req.url}`);
+  res.on("finish", () => {
+    console.log(
+      `✅ [${new Date().toISOString()}] ${req.method} ${req.url} ${res.statusCode}`,
+    );
+  });
+  next();
+});
+
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/services", serviceRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/wallet", walletRoutes);
+app.use("/api/coupons", couponRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/service-providers", serviceProviderRoutes);
+app.use("/api/cities", cityRoutes);
+app.use("/api/withdrawals", withdrawalRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/announcements", announcementRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/settings", settingRoutes);
+
+app.get("/", (req, res) => {
+  res.send("LocalServiceHub API is running...");
+});
+
+// Error Handling Middlewares
+app.use(notFound);
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 5000;
+
+httpServer.listen(PORT, () => {
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  console.log(`Socket.io listening on port ${PORT}`);
+});
+
+// Global error handlers to prevent silent crashes
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("🔴 Unhandled Rejection at:", promise, "reason:", reason);
+  // Don't exit - just log. The error middleware will handle Express errors.
+});
+
+process.on("uncaughtException", (error) => {
+  console.error("🔴 Uncaught Exception:", error);
+  // For truly fatal errors, exit gracefully
+  if (error.code === "EADDRINUSE") {
+    console.error(`Port ${PORT} is already in use.`);
+    process.exit(1);
+  }
+});
+
+//

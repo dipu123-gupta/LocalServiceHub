@@ -1,0 +1,14 @@
+import express from "express";
+import {
+  createRazorpayOrder,
+  verifyPayment,
+} from "../controllers/paymentController.js";
+import { protect } from "../middlewares/authMiddleware.js";
+
+const router = express.Router();
+
+// Protected routes
+router.post("/create-order", protect, createRazorpayOrder);
+router.post("/verify", protect, verifyPayment);
+
+export default router;
