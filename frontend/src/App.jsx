@@ -139,12 +139,15 @@ function App() {
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
             </Route>
 
-            <Route path="/checkout/:bookingId" element={<PaymentPage />} />
+            {/* Payment routes - require authentication */}
+            <Route element={<ProtectedRoute allowedRoles={["user", "provider", "admin"]} />}>
+              <Route path="/checkout/:bookingId" element={<PaymentPage />} />
+              <Route
+                path="/subscribe/checkout/:planId"
+                element={<SubscriptionCheckoutPage />}
+              />
+            </Route>
             <Route path="/subscriptions" element={<SubscriptionPage />} />
-            <Route
-              path="/subscribe/checkout/:planId"
-              element={<SubscriptionCheckoutPage />}
-            />
 
             {/* New Routes */}
             <Route path="/about" element={<About />} />

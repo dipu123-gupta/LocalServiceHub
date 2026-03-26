@@ -23,7 +23,7 @@ import {
 import { motion } from "framer-motion";
 import api from "@/utils/api";
 import { useSelector, useDispatch } from "react-redux";
-import { logout, setCredentials } from "../../store/authSlice";
+import { logout, updateUserInfo } from "../../store/authSlice";
 import PasswordInput from "../../components/common/PasswordInput";
 import Button from "../../components/common/Button";
 import { Key } from "lucide-react";
@@ -113,15 +113,17 @@ const Profile = () => {
     e.preventDefault();
     setSaving(true);
     try {
+      // Update Provider Profile
       const { data } = await api.put("/service-providers/profile", formData);
       setProfile(data);
       
-      // Update Redux userInfo with the updated name/phone from formData
-      dispatch(setCredentials({
-        ...userInfo,
+      // Update User level details (name/phone)
+      const userRes = await api.put("/auth/profile", {
         name: formData.name,
         phone: formData.phone
-      }));
+      });
+      
+      dispatch(updateUserInfo(userRes.data));
 
       alert("Profile updated successfully!");
     } catch (err) {
@@ -129,6 +131,29 @@ const Profile = () => {
       alert("Failed to update profile. Please check your data.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const [imageUploading, setImageUploading] = useState(false);
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setImageUploading(true);
+    const data = new FormData();
+    data.append("profileImage", file);
+
+    try {
+      const { data: updatedUserData } = await api.put("/auth/profile", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      dispatch(updateUserInfo(updatedUserData));
+      alert("Profile image updated successfully!");
+    } catch (err) {
+      alert("Failed to update profile image.");
+    } finally {
+      setImageUploading(false);
     }
   };
 
@@ -203,9 +228,20 @@ const Profile = () => {
                 userInfo?.name?.[0].toUpperCase()
               )}
             </div>
-            <button className="absolute -bottom-2 -right-2 p-3 bg-indigo-600 text-white rounded-2xl shadow-xl hover:bg-slate-900 transition-all border-4 border-white group-hover:translate-all active:scale-90">
-              <Camera size={20} />
+            <button 
+              onClick={() => document.getElementById("profileImageInput").click()}
+              disabled={imageUploading}
+              className="absolute -bottom-2 -right-2 p-3 bg-indigo-600 text-white rounded-2xl shadow-xl hover:bg-slate-900 transition-all border-4 border-white group-hover:translate-all active:scale-90 disabled:opacity-50"
+            >
+              {imageUploading ? <Loader2 size={20} className="animate-spin" /> : <Camera size={20} />}
             </button>
+            <input
+              id="profileImageInput"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
           </div>
           <div>
             <div className="flex items-center gap-3 mb-2">

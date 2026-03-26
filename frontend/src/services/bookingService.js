@@ -10,7 +10,7 @@ export const bookingService = {
     return response.data;
   },
   getProviderBookings: async () => {
-    const response = await api.get("/bookings/providerbookings");
+    const response = await api.get("/bookings/provider");
     return response.data;
   },
   getAllBookings: async () => {

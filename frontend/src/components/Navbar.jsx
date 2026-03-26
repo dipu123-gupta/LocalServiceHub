@@ -161,8 +161,21 @@ const Navbar = () => {
                   onClick={() => setIsDropOpen(!isDropOpen)}
                   className="flex items-center gap-2.5 bg-white border border-slate-100 rounded-2xl pl-1.5 pr-4 py-1.5 hover:shadow-xl hover:shadow-indigo-100/50 hover:border-indigo-100 transition-all duration-300"
                 >
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center text-white text-sm font-black shadow-md">
-                    {userInfo.name?.charAt(0).toUpperCase()}
+                  <div className="w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center text-white text-sm font-black shadow-md">
+                    {userInfo.profileImage ? (
+                      <img
+                        src={userInfo.profileImage}
+                        alt={userInfo.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = ""; // Fallback will show initials if img fails
+                        }}
+                      />
+                    ) : (
+                      userInfo.name?.charAt(0).toUpperCase()
+                    )}
+                    {!userInfo.profileImage && userInfo.name?.charAt(0).toUpperCase()}
                   </div>
                   <div className="text-left hidden sm:block">
                     <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">Account</p>

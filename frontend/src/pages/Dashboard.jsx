@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
-import { setCredentials, logout } from "../store/authSlice";
+import { setCredentials, logout, updateUserInfo } from "../store/authSlice";
 import api from "@/utils/api";
 import {
   User,
@@ -164,9 +164,9 @@ const Dashboard = () => {
       }
 
       const { data } = await api.put("/auth/profile", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { "Content-Type": "multipart/form-type" },
       });
-      dispatch(setCredentials({ ...userInfo, ...data }));
+      dispatch(updateUserInfo(data));
       setProfileSuccess(true);
       setProfileImage(null);
     } catch (err) {

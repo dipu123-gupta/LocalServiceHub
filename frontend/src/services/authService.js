@@ -35,4 +35,9 @@ export const authService = {
     const response = await api.put(`/auth/reset-password/${token}`, passwords);
     return response.data;
   },
+
+  googleAuth: async (idToken) => {
+    const response = await api.post("/auth/google", { idToken });
+    return response.data;
+  },
 };
