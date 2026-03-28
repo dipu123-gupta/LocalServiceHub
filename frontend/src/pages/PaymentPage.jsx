@@ -138,7 +138,7 @@ const PaymentPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-32 pb-24 px-4 overflow-hidden relative">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-32 pb-24 px-4 overflow-hidden relative transition-colors duration-300">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[120px] -mr-64 -mt-64" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-[120px] -ml-64 -mb-64" />
 
@@ -158,25 +158,25 @@ const PaymentPage = () => {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="lg:col-span-7 bg-white rounded-[3.5rem] p-10 md:p-14 border border-slate-100 shadow-2xl shadow-slate-200/50"
+            className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-[3.5rem] p-10 md:p-14 border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/50 dark:shadow-none"
           >
             <div className="flex items-center gap-4 mb-12">
-              <div className="w-16 h-16 bg-indigo-600 text-white rounded-[1.5rem] flex items-center justify-center shadow-xl shadow-indigo-100">
+              <div className="w-16 h-16 bg-indigo-600 text-white rounded-[1.5rem] flex items-center justify-center shadow-xl shadow-indigo-100 dark:shadow-none">
                 <ShieldCheck size={32} />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">Secure Payment</h1>
-                <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">PCI-DSS Compliant Gateway</p>
+                <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white leading-tight">Secure Payment</h1>
+                <p className="text-slate-400 dark:text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">PCI-DSS Compliant Gateway</p>
               </div>
             </div>
 
             <div className="space-y-10">
-              <div className="p-8 bg-slate-50 rounded-[2rem] border border-slate-100/50">
-                <div className="flex items-center gap-3 text-indigo-600 font-black text-sm mb-4">
+              <div className="p-8 bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] border border-slate-100/50 dark:border-slate-700/50 transition-colors">
+                <div className="flex items-center gap-3 text-indigo-600 dark:text-indigo-400 font-black text-sm mb-4">
                   <Lock size={16} /> Trusted Encryption
                 </div>
-                <p className="text-slate-600 font-bold leading-relaxed">
-                  You are completing payment for <span className="text-slate-900">{booking?.service?.title}</span>. 
+                <p className="text-slate-600 dark:text-slate-300 font-bold leading-relaxed">
+                  You are completing payment for <span className="text-slate-900 dark:text-white">{booking?.service?.title}</span>. 
                   All transaction details are encrypted and securely processed via Razorpay.
                 </p>
               </div>
@@ -274,11 +274,11 @@ const PaymentPage = () => {
               </div>
             </div>
 
-            <div className="p-8 bg-emerald-50 rounded-[2rem] border border-emerald-100 flex items-start gap-4">
+            <div className="p-8 bg-emerald-50 dark:bg-emerald-900/10 rounded-[2rem] border border-emerald-100 dark:border-emerald-900/50 flex items-start gap-4 transition-colors">
               <div className="p-2 bg-emerald-500 text-white rounded-xl">
                 <ShieldCheck size={20} />
               </div>
-              <p className="text-emerald-700 font-bold text-xs leading-relaxed">
+              <p className="text-emerald-700 dark:text-emerald-400 font-bold text-xs leading-relaxed">
                 Your payment is protected by our HomeServiceHub Guarantee. If the professional doesn't show up, we refund 100% of your amount.
               </p>
             </div>

@@ -41,9 +41,9 @@ const UserOverviewTab = ({ bookings, completedBookings, wallet, reviews, totalSp
       </div>
 
       {/* Recent Bookings */}
-      <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
         <div className="flex items-center justify-between mb-8">
-          <h3 className="text-xl font-black text-slate-900 tracking-tight">
+          <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
             Recent Bookings
           </h3>
           {bookings.length > 3 && (
@@ -59,7 +59,7 @@ const UserOverviewTab = ({ bookings, completedBookings, wallet, reviews, totalSp
           </div>
         ) : bookings.length === 0 ? (
           <div className="text-center py-16 px-6">
-            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <BookOpen className="text-slate-300" size={32} />
             </div>
             <p className="text-slate-500 font-medium mb-6">
@@ -74,17 +74,17 @@ const UserOverviewTab = ({ bookings, completedBookings, wallet, reviews, totalSp
             {bookings.slice(0, 3).map((b) => (
               <div
                 key={b._id}
-                className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-slate-50/50 border border-slate-100 hover:bg-white hover:shadow-lg transition-all"
+                className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg dark:hover:shadow-none transition-all duration-300"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-xl shadow-sm">
+                  <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl shadow-sm transition-colors">
                     🏠
                   </div>
                   <div>
-                    <div className="font-bold text-slate-900">
+                    <div className="font-bold text-slate-900 dark:text-white transition-colors">
                       {b.service?.title || "Service"}
                     </div>
-                    <div className="text-xs text-slate-400 font-bold mt-1">
+                    <div className="text-xs text-slate-400 dark:text-slate-500 font-bold mt-1 transition-colors">
                       {b.bookingDate
                         ? new Date(b.bookingDate).toLocaleDateString("en-IN", {
                             day: "numeric",
@@ -97,7 +97,7 @@ const UserOverviewTab = ({ bookings, completedBookings, wallet, reviews, totalSp
                   </div>
                 </div>
                 <div className="flex items-center gap-6">
-                  <div className="text-lg font-black text-slate-900">
+                  <div className="text-lg font-black text-slate-900 dark:text-white transition-colors">
                     ₹{b.totalAmount}
                   </div>
                   <Badge variant={b.status}>

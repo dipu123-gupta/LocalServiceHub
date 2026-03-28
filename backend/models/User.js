@@ -13,15 +13,26 @@ const userSchema = new mongoose.Schema(
       required: [true, "Please add an email"],
       unique: true,
       match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,10})+$/,
         "Please add a valid email",
       ],
     },
     password: {
       type: String,
-      required: [true, "Please add a password"],
+      required: function () {
+        return this.authProvider !== "google";
+      },
       minlength: 6,
       select: false,
+    },
+    googleId: {
+      type: String,
+      sparse: true,
+    },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
     },
     role: {
       type: String,
@@ -98,17 +109,28 @@ userSchema.pre("save", async function () {
     this.password = await bcrypt.hash(this.password, salt);
   }
 
-  // Generate referral code if not present
+  // Generate referral code if not present (with retry for uniqueness)
   if (!this.referralCode) {
-    this.referralCode = Math.random()
-      .toString(36)
-      .substring(2, 8)
-      .toUpperCase();
+    const User = mongoose.model("User");
+    let code;
+    let attempts = 0;
+    const maxAttempts = 5;
+    
+    do {
+      code = crypto.randomBytes(4).toString("hex").toUpperCase().substring(0, 6);
+      attempts++;
+      // Check if this code already exists
+      const existing = await User.findOne({ referralCode: code });
+      if (!existing) break;
+    } while (attempts < maxAttempts);
+    
+    this.referralCode = code;
   }
 });
 
 // Match user entered password to hashed password in database
 userSchema.methods.matchPassword = async function (enteredPassword) {
+  if (!this.password) return false;
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

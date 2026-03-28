@@ -24,16 +24,16 @@ const AdminAnnouncementsTab = ({
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start animate-in fade-in slide-in-from-bottom-4 duration-500 transition-colors">
       {/* Create Form */}
-      <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm sticky top-8">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm sticky top-8 transition-colors">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-inner">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-inner transition-colors">
             <Megaphone size={24} />
           </div>
           <div>
-            <h3 className="text-xl font-black text-slate-900 tracking-tight">Broadcast</h3>
-            <p className="text-slate-500 text-sm font-medium">Send alerts to the community</p>
+            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Broadcast</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Send alerts to the community</p>
           </div>
         </div>
 
@@ -47,7 +47,7 @@ const AdminAnnouncementsTab = ({
           />
 
           <div className="space-y-2">
-            <label className="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest ml-1">
+            <label className="text-[0.65rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">
               Broadcasting Content
             </label>
             <textarea
@@ -56,12 +56,12 @@ const AdminAnnouncementsTab = ({
               value={announcementForm.message}
               onChange={(e) => setAnnouncementForm({ ...announcementForm, message: e.target.value })}
               placeholder="Write your message here..."
-              className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-5 text-sm font-bold text-slate-700 outline-none focus:border-indigo-600 focus:bg-white transition-all shadow-inner resize-none"
+              className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-100 dark:border-slate-700 rounded-2xl py-4 px-5 text-sm font-bold text-slate-700 dark:text-slate-200 outline-none focus:border-indigo-600 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-950 transition-all shadow-inner resize-none"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest ml-1">
+            <label className="text-[0.65rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">
               Target Segment
             </label>
             <div className="grid grid-cols-1 gap-3">
@@ -76,11 +76,11 @@ const AdminAnnouncementsTab = ({
                   onClick={() => setAnnouncementForm({ ...announcementForm, targetRole: role.id })}
                   className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-all text-sm font-black text-left ${
                     announcementForm.targetRole === role.id 
-                      ? "bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-100" 
-                      : "bg-white border-slate-100 text-slate-500 hover:border-indigo-100 hover:bg-slate-50"
+                      ? "bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-100 dark:shadow-none" 
+                      : "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-100 dark:hover:border-indigo-900 hover:bg-slate-50 dark:hover:bg-slate-700/50"
                   }`}
                 >
-                  <role.icon size={20} className={announcementForm.targetRole === role.id ? "text-white" : "text-slate-400"} />
+                  <role.icon size={20} className={announcementForm.targetRole === role.id ? "text-white" : "text-slate-400 dark:text-slate-500"} />
                   {role.label}
                 </button>
               ))}
@@ -91,7 +91,7 @@ const AdminAnnouncementsTab = ({
             type="submit"
             isLoading={isSendingAnnouncement}
             icon={Send}
-            className="w-full h-14 rounded-2xl shadow-xl shadow-indigo-100/50"
+            className="w-full h-14 rounded-2xl shadow-xl shadow-indigo-100/50 dark:shadow-none"
           >
             Broadcast Message
           </Button>
@@ -100,37 +100,37 @@ const AdminAnnouncementsTab = ({
 
       {/* History */}
       <div className="xl:col-span-2 space-y-6">
-        <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm flex items-center justify-between transition-colors">
           <div>
-            <h3 className="text-xl font-black text-slate-900 tracking-tight">Announcement History</h3>
-            <p className="text-slate-500 text-sm font-medium">Logs of all previous broadcasts</p>
+            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Announcement History</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Logs of all previous broadcasts</p>
           </div>
-          <Badge variant="gray" className="px-4 py-1.5">{announcements.length} Total</Badge>
+          <Badge variant="gray" className="px-4 py-1.5 dark:bg-slate-800 dark:text-slate-400">{announcements.length} Total</Badge>
         </div>
 
         <div className="grid grid-cols-1 gap-6">
           {announcements.length === 0 ? (
-            <div className="bg-white rounded-3xl p-20 text-center border border-slate-100 border-dashed">
-              <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                <Megaphone className="text-slate-300" size={32} />
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-20 text-center border border-slate-100 dark:border-slate-800 border-dashed transition-colors">
+              <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100 dark:border-slate-700">
+                <Megaphone className="text-slate-300 dark:text-slate-600" size={32} />
               </div>
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No history found</p>
+              <p className="text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest text-xs">No history found</p>
             </div>
           ) : (
             announcements.map((a) => (
               <div
                 key={a._id}
-                className="group relative bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl hover:shadow-indigo-100/40 transition-all hover:border-indigo-100"
+                className="group relative bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 hover:shadow-xl hover:shadow-indigo-100/40 dark:hover:shadow-none transition-all hover:border-indigo-100 dark:hover:border-indigo-900"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex flex-wrap items-center gap-3">
                     <div className={`px-3 py-1 rounded-lg text-[0.6rem] font-black uppercase tracking-[0.2em] border shadow-sm ${
-                      a.targetRole === "all" ? "bg-slate-900 text-white border-slate-900" : "bg-indigo-50 text-indigo-600 border-indigo-100"
+                      a.targetRole === "all" ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white" : "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/50"
                     }`}>
                       {a.targetRole}
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
-                      <Calendar size={14} className="text-slate-300" />
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 dark:text-slate-500">
+                      <Calendar size={14} className="text-slate-300 dark:text-slate-600" />
                       {new Date(a.createdAt).toLocaleDateString("en-IN", {
                         day: "numeric",
                         month: "short",
@@ -141,16 +141,16 @@ const AdminAnnouncementsTab = ({
                   
                   <button
                     onClick={() => handleDeleteAnnouncement(a._id)}
-                    className="p-2.5 rounded-xl bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all opacity-0 group-hover:opacity-100"
+                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/40 hover:text-rose-500 transition-all opacity-0 group-hover:opacity-100"
                   >
                     <Trash2 size={18} />
                   </button>
                 </div>
                 
-                <h4 className="text-lg font-black text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">
+                <h4 className="text-lg font-black text-slate-900 dark:text-white mb-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                   {a.title}
                 </h4>
-                <p className="text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <p className="text-slate-600 dark:text-slate-400 font-medium leading-relaxed bg-slate-50 dark:bg-slate-800/30 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
                   {a.message}
                 </p>
               </div>

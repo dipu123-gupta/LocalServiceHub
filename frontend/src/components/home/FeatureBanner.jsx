@@ -30,7 +30,7 @@ const FeatureBanner = () => {
   ];
 
   return (
-    <section className="bg-slate-50 py-24 px-6 overflow-hidden">
+    <section className="bg-slate-50 dark:bg-slate-950 py-24 px-6 overflow-hidden transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((f, i) => (
@@ -40,16 +40,16 @@ const FeatureBanner = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="group bg-white rounded-[2.5rem] p-8 flex flex-col gap-6 items-start border border-slate-100 shadow-sm transition-all hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-2"
+              className="group bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 flex flex-col gap-6 items-start border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-2xl hover:shadow-indigo-500/10 dark:hover:shadow-indigo-900/20 hover:-translate-y-2"
             >
-              <div className={`w-16 h-16 rounded-2xl ${f.bg} ${f.iconColor} flex items-center justify-center shrink-0 shadow-lg ${f.glow} group-hover:scale-110 transition-transform duration-500`}>
+              <div className={`w-16 h-16 rounded-2xl ${f.bg} dark:bg-slate-800 ${f.iconColor} flex items-center justify-center shrink-0 shadow-lg ${f.glow} group-hover:scale-110 transition-transform duration-500`}>
                 {f.icon}
               </div>
               <div>
-                <div className="text-xl font-black text-slate-900 mb-3 tracking-tight">
+                <div className="text-xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
                   {f.title}
                 </div>
-                <p className="text-slate-500 leading-relaxed font-medium">
+                <p className="text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                   {f.desc}
                 </p>
               </div>

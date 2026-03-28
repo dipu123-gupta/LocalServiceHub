@@ -9,6 +9,8 @@ import {
   getAllBookings,
   cancelBooking,
   getPaymentTransactions,
+  addAdditionalCharge,
+  approveAdditionalCharge,
 } from "../controllers/bookingController.js";
 import { protect, provider, admin } from "../middlewares/authMiddleware.js";
 import {
@@ -28,6 +30,8 @@ router.route("/admin/stats").get(protect, admin, getAdminStats);
 router.route("/admin/transactions").get(protect, admin, getPaymentTransactions);
 router.route("/:id").get(protect, getBookingById);
 router.route("/:id/status").put(protect, provider, updateBookingStatus);
+router.route("/:id/additional-charge").post(protect, provider, addAdditionalCharge);
+router.route("/:id/approve-charge/:chargeId").put(protect, approveAdditionalCharge);
 router.route("/:id/cancel").put(protect, cancelBooking);
 
 export default router;

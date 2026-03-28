@@ -66,15 +66,15 @@ const Notifications = () => {
         description="Monitor your bookings, interactions, and stay updated with the platform alerts in real-time."
       />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-20">
-        <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-          <div className="p-10 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white sticky top-0 z-30 gap-6">
-            <div className="flex items-center gap-4">
-               <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-                  <Bell size={24} />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 md:-mt-12 relative z-20">
+        <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+          <div className="p-6 md:p-10 border-b border-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center bg-white sticky top-0 z-30 gap-6">
+            <div className="flex items-center gap-3 md:gap-4">
+               <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                  <Bell size={20} className="md:w-6 md:h-6" />
                </div>
                <div>
-                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">Recent Alerts</h3>
+                  <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Recent Alerts</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <div className="w-2 h-2 rounded-full bg-indigo-500" />
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
@@ -87,7 +87,7 @@ const Notifications = () => {
             {unreadCount > 0 && (
               <button 
                 onClick={markAllRead}
-                className="group flex items-center gap-3 px-6 py-3 bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
+                className="w-full md:w-auto group flex items-center justify-center gap-3 px-6 py-3.5 md:py-3 bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
               >
                 <CheckCheck size={16} className="transition-transform group-hover:scale-110" />
                 Mark all read
@@ -123,16 +123,16 @@ const Notifications = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05 }}
                         onClick={() => !notif.isRead && markOneRead(notif._id)}
-                        className={`group p-8 flex gap-6 transition-all cursor-pointer relative ${notif.isRead ? "bg-white opacity-70" : "bg-indigo-50/10 hover:bg-indigo-50/20"}`}
+                        className={`group p-5 md:p-8 flex gap-4 md:gap-6 transition-all cursor-pointer relative ${notif.isRead ? "bg-white opacity-70" : "bg-indigo-50/10 hover:bg-indigo-50/20"}`}
                       >
                         {!notif.isRead && (
                           <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-600" />
                         )}
                         
                         <div
-                          className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-white transition-transform group-hover:scale-110 ${config.bg} ${config.color}`}
+                          className={`w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-white transition-transform group-hover:scale-110 ${config.bg} ${config.color}`}
                         >
-                          <config.icon size={24} />
+                          <config.icon size={20} className="md:w-6 md:h-6" />
                         </div>
                         
                         <div className="flex-grow min-w-0">

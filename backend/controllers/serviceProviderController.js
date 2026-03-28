@@ -196,11 +196,15 @@ const verifyProviderStatus = asyncHandler(async (req, res) => {
 // @route   GET /api/service-providers/stats
 // @access  Private/Provider
 const getProviderStats = asyncHandler(async (req, res) => {
-  const provider = await ServiceProvider.findOne({ user: req.user._id });
-
+  let provider = await ServiceProvider.findOne({ user: req.user._id });
+  
   if (!provider) {
-    res.status(404);
-    throw new Error("Provider profile not found");
+    // Create a default profile if it doesn't exist to prevent 404 on dashboard
+    provider = await ServiceProvider.create({
+      user: req.user._id,
+      businessName: `${req.user.name}'s Services`,
+      description: "No description provided yet.",
+    });
   }
 
   const { default: Booking } = await import("../models/Booking.js");
@@ -259,6 +263,25 @@ const getAllProviders = asyncHandler(async (req, res) => {
   res.json(providers);
 });
 
+// @desc    Update provider availability slots
+// @route   PUT /api/service-providers/availability-slots
+// @access  Private/Provider
+const updateAvailabilitySlots = asyncHandler(async (req, res) => {
+  const { slots, days } = req.body;
+  const provider = await ServiceProvider.findOne({ user: req.user._id });
+
+  if (provider) {
+    if (days) provider.availability.days = days;
+    if (slots) provider.availability.slots = slots;
+    
+    const updatedProvider = await provider.save();
+    res.json(updatedProvider);
+  } else {
+    res.status(404);
+    throw new Error("Provider profile not found");
+  }
+});
+
 export {
   getProviderProfile,
   updateProviderProfile,
@@ -267,4 +290,5 @@ export {
   verifyProviderStatus,
   getAllProviders,
   getProviderStats,
+  updateAvailabilitySlots,
 };

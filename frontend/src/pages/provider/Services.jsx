@@ -62,12 +62,12 @@ const Services = () => {
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors">
         <div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
-            My <span className="text-indigo-600">Services</span>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight transition-colors">
+            My <span className="text-indigo-600 dark:text-indigo-400 font-black">Services</span>
           </h1>
-          <p className="text-slate-500 font-bold mt-2">
+          <p className="text-slate-500 dark:text-slate-400 font-bold mt-2 transition-colors">
             Managed {services.length} active service listings across the platform.
           </p>
         </div>
@@ -76,7 +76,7 @@ const Services = () => {
             setSelectedService(null);
             setIsModalOpen(true);
           }}
-          className="flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-[1.5rem] font-black shadow-xl shadow-indigo-200 hover:bg-slate-900 transition-all active:scale-95 group"
+          className="flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-[1.5rem] font-black shadow-xl shadow-indigo-200 dark:shadow-none hover:bg-slate-900 dark:hover:bg-white dark:hover:text-slate-900 transition-all active:scale-95 group"
         >
           <Plus size={20} className="group-hover:rotate-90 transition-transform" />
           Create Service
@@ -84,18 +84,18 @@ const Services = () => {
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col md:flex-row gap-4 transition-colors">
         <div className="flex-1 relative group">
-          <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+          <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors" />
           <input 
             type="text"
             placeholder="Search your services..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-2xl py-4 pl-14 pr-6 text-sm font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-200 transition-all shadow-sm"
+            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-4 pl-14 pr-6 text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-indigo-50 dark:focus:ring-indigo-900/20 focus:border-indigo-200 dark:focus:border-indigo-800 transition-all shadow-sm dark:shadow-none"
           />
         </div>
-        <button className="px-6 py-4 bg-white border border-slate-200 rounded-2xl font-black text-sm text-slate-600 flex items-center gap-3 hover:bg-slate-50 transition-all">
+        <button className="px-6 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl font-black text-sm text-slate-600 dark:text-slate-400 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
           <Filter size={18} />
           Filters
         </button>
@@ -108,23 +108,23 @@ const Services = () => {
           <p className="text-sm font-black text-slate-400 uppercase tracking-widest">Syncing your portfolio...</p>
         </div>
       ) : filteredServices.length === 0 ? (
-        <div className="bg-white rounded-[3rem] border-2 border-dashed border-slate-100 p-20 text-center">
-          <div className="w-24 h-24 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Layers size={40} className="text-indigo-200" />
+        <div className="bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-dashed border-slate-100 dark:border-slate-800 p-20 text-center transition-colors">
+          <div className="w-24 h-24 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-6 transition-colors">
+            <Layers size={40} className="text-indigo-200 dark:text-indigo-700" />
           </div>
-          <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-2">No Services Found</h3>
-          <p className="text-slate-500 font-bold max-w-sm mx-auto mb-8">
+          <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-2 transition-colors">No Services Found</h3>
+          <p className="text-slate-500 dark:text-slate-400 font-bold max-w-sm mx-auto mb-8 transition-colors">
             You haven't added any services yet. Start adding services to get your first booking!
           </p>
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-indigo-600 transition-all shadow-xl"
+            className="px-10 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-sm hover:bg-indigo-600 dark:hover:bg-indigo-500 dark:hover:text-white transition-all shadow-xl dark:shadow-none"
           >
             Add Your First Service
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-colors">
           <AnimatePresence mode="popLayout">
             {filteredServices.map((service, idx) => (
               <motion.div
@@ -133,7 +133,7 @@ const Services = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 key={service._id}
-                className="group bg-white rounded-[2.5rem] border border-slate-100 shadow-xl overflow-hidden hover:shadow-2xl hover:shadow-indigo-100/50 hover:-translate-y-2 transition-all duration-500 relative"
+                className="group bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl dark:shadow-none overflow-hidden hover:shadow-2xl dark:hover:shadow-none hover:-translate-y-2 transition-all duration-500 relative"
               >
                 {/* Image Section */}
                 <div className="h-56 relative overflow-hidden">
@@ -144,13 +144,13 @@ const Services = () => {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
                     />
                   ) : (
-                    <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300">
+                    <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-600">
                       <ImageIcon size={48} />
                     </div>
                   )}
                   <div className="absolute top-4 left-4">
-                    <div className="px-4 py-2 bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-white">
-                      <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest leading-none">
+                    <div className="px-4 py-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-xl shadow-lg border border-white dark:border-slate-800">
+                      <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest leading-none">
                         {service.category?.name}
                       </p>
                     </div>
@@ -171,33 +171,33 @@ const Services = () => {
                 </div>
 
                 {/* Content */}
-                <div className="p-8">
+                <div className="p-6 md:p-8">
                   <div className="flex justify-between items-start mb-4">
-                    <h4 className="text-xl font-black text-slate-900 tracking-tight leading-tight group-hover:text-indigo-600 transition-colors">
+                    <h4 className="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                       {service.title}
                     </h4>
-                    <span className={`w-3 h-3 rounded-full ${service.isActive ? "bg-emerald-500" : "bg-slate-300"} shadow-sm`} />
+                    <span className={`w-3 h-3 rounded-full ${service.isActive ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"} shadow-sm`} />
                   </div>
-                  <p className="text-slate-500 font-bold text-xs line-clamp-2 mb-8 h-10">
+                  <p className="text-slate-500 dark:text-slate-400 font-bold text-xs line-clamp-2 mb-8 h-10 transition-colors">
                     {service.description}
                   </p>
 
-                  <div className="flex items-center justify-between pt-6 border-t border-slate-50">
+                  <div className="flex items-center justify-between pt-6 border-t border-slate-50 dark:border-slate-800 transition-colors">
                     <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 shadow-sm">
+                      <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm transition-colors">
                         <IndianRupee size={16} strokeWidth={3} />
                       </div>
                       <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Price/Job</p>
-                        <p className="text-lg font-black text-slate-900 leading-none">₹{service.price}</p>
+                        <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1 transition-colors">Price/Job</p>
+                        <p className="text-lg font-black text-slate-900 dark:text-white leading-none transition-colors">₹{service.price}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="flex items-center gap-1.5 justify-end text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                      <div className="flex items-center gap-1.5 justify-end text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 transition-colors">
                         <Clock size={12} />
                         Duration
                       </div>
-                      <p className="text-sm font-black text-slate-700 leading-none">{service.duration} mins</p>
+                      <p className="text-sm font-black text-slate-700 dark:text-slate-300 leading-none transition-colors">{service.duration} mins</p>
                     </div>
                   </div>
                 </div>
@@ -205,7 +205,7 @@ const Services = () => {
                 {/* Quick Deletion */}
                 <button 
                   onClick={() => handleDelete(service._id)}
-                  className="absolute top-4 right-4 p-2 bg-rose-500 text-white rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-900 scale-75 group-hover:scale-100 active:scale-90"
+                  className="absolute top-4 right-4 p-2 bg-rose-500 text-white rounded-xl shadow-lg opacity-100 md:opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-900 md:scale-75 group-hover:scale-100 active:scale-90"
                 >
                   <Trash2 size={16} />
                 </button>

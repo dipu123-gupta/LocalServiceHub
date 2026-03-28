@@ -7,19 +7,21 @@ import User from "../models/User.js";
 let isFirebaseInitialized = false;
 
 const initFirebase = () => {
+  console.log("🔥 [Firebase] Attempting to initialize Admin SDK...");
   try {
-    if (!process.env.FIREBASE_SERVICE_ACCOUNT_PATH || !fs.existsSync(process.env.FIREBASE_SERVICE_ACCOUNT_PATH)) {
+    const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
+    if (!serviceAccountPath || !fs.existsSync(serviceAccountPath)) {
+      console.error("❌ [Firebase] Service account file NOT FOUND at:", serviceAccountPath);
       return;
     }
 
     admin.initializeApp({
-      credential: admin.credential.cert(
-        process.env.FIREBASE_SERVICE_ACCOUNT_PATH,
-      ),
+      credential: admin.credential.cert(serviceAccountPath),
     });
     isFirebaseInitialized = true;
+    console.log("✅ [Firebase] Admin SDK initialized successfully!");
   } catch (error) {
-    console.error("Firebase Admin initialization error:", error);
+    console.error("❌ [Firebase] Admin SDK initialization error:", error.message);
   }
 };
 
@@ -52,7 +54,7 @@ export const sendPushNotification = async (userId, title, body, data = {}) => {
       tokens: user.fcmTokens,
     };
 
-    const response = await admin.messaging().sendMulticast(message);
+    const response = await admin.messaging().sendEachForMulticast(message);
 
     // Cleanup invalid tokens
     if (response.failureCount > 0) {

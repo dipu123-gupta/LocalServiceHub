@@ -119,30 +119,30 @@ const NotificationBell = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 15, scale: 0.95 }}
             transition={{ type: "spring", damping: 20, stiffness: 300 }}
-            className="absolute top-14 right-0 w-[400px] bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-indigo-900/10 z-[100] overflow-hidden"
+            className="absolute top-14 right-0 w-[calc(100vw-2rem)] sm:w-[400px] bg-white rounded-[2rem] sm:rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-indigo-900/10 z-[100] overflow-hidden"
           >
             {/* Header */}
-            <div className="p-8 border-b border-slate-50 flex items-center justify-between">
+            <div className="p-6 md:p-8 border-b border-slate-50 flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-black text-slate-900 tracking-tight">Notifications</h3>
+                <h3 className="text-lg md:text-xl font-black text-slate-900 tracking-tight">Notifications</h3>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
                   {unread} Unread Items
                 </p>
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-2 md:gap-3">
                 {unread > 0 && (
                   <button
                     onClick={markAllRead}
-                    className="h-10 px-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-2"
+                    className="h-9 md:h-10 px-3 md:px-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-2"
                   >
-                    <CheckCheck size={14} /> Clear All
+                    <CheckCheck size={12} className="md:w-3.5 md:h-3.5" /> <span className="hidden xs:inline">Clear All</span>
                   </button>
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-slate-100 text-slate-400 rounded-xl transition-colors"
+                  className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center bg-slate-50 hover:bg-slate-100 text-slate-400 rounded-xl transition-colors"
                 >
-                  <X size={18} />
+                  <X size={16} />
                 </button>
               </div>
             </div>
@@ -169,13 +169,13 @@ const NotificationBell = () => {
                     onClick={() => {
                       if (!n.isRead) markOneRead(n._id);
                     }}
-                    className={`px-8 py-6 flex gap-5 cursor-pointer transition-all border-b border-transparent last:border-none ${
+                    className={`px-6 py-4 md:px-8 md:py-6 flex gap-4 md:gap-5 cursor-pointer transition-all border-b border-transparent last:border-none ${
                       n.isRead 
                         ? "bg-white hover:bg-slate-50/80 grayscale-[0.5] opacity-70" 
                         : "bg-indigo-50/5 hover:bg-indigo-50/10"
                     }`}
                   >
-                    <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-2xl shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-xl md:text-2xl shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform">
                       {typeEmoji[n.type] || "🔔"}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -187,7 +187,7 @@ const NotificationBell = () => {
                           <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-lg shadow-indigo-400/50 flex-shrink-0 mt-1.5" />
                         )}
                       </div>
-                      <p className={`text-xs leading-relaxed mb-3 line-clamp-2 ${n.isRead ? "text-slate-400 font-medium" : "text-slate-500 font-bold"}`}>
+                      <p className={`text-[11px] md:text-xs leading-relaxed mb-3 ${n.isRead ? "text-slate-400 font-medium" : "text-slate-500 font-bold"}`}>
                         {n.message}
                       </p>
                       <div className="flex items-center gap-3">
@@ -213,11 +213,11 @@ const NotificationBell = () => {
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="p-6 bg-slate-50/50 border-t border-slate-50">
+              <div className="p-4 md:p-6 bg-slate-50/50 border-t border-slate-50">
                 <Link
                   to="/profile"
                   onClick={() => setIsOpen(false)}
-                  className="w-full h-14 bg-white border border-slate-100 hover:border-indigo-100 hover:bg-indigo-50/30 text-slate-900 hover:text-indigo-600 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-sm active:scale-[0.98]"
+                  className="w-full h-12 md:h-14 bg-white border border-slate-100 hover:border-indigo-100 hover:bg-indigo-50/30 text-slate-900 hover:text-indigo-600 rounded-xl md:rounded-2xl text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] md:tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-sm active:scale-[0.98]"
                 >
                   <Sparkles size={14} /> View All Activity
                 </Link>

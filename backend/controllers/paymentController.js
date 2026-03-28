@@ -111,27 +111,9 @@ const verifyPayment = asyncHandler(async (req, res) => {
       const booking = await Booking.findById(bookingId).populate("service");
       if (booking) {
         booking.paymentStatus = "completed";
-        booking.status = "confirmed";
+        // Do NOT auto-set status to "accepted" — provider must accept manually
         booking.razorpayPaymentId = razorpay_payment_id;
         await booking.save();
-
-        // Loyalty points
-        const wallet = await Wallet.findOne({ user: booking.user });
-        if (wallet) {
-          const points = Math.floor(booking.totalAmount / 100);
-          wallet.loyaltyPoints += points;
-          await wallet.save();
-
-          await Transaction.create({
-            user: booking.user,
-            amount: 0,
-            points,
-            type: "credit",
-            category: "points",
-            description: `Points earned for ${booking.service.title}`,
-            booking: booking._id,
-          });
-        }
       }
       return res
         .status(200)

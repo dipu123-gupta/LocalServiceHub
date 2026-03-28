@@ -68,43 +68,43 @@ const HelpCenter = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
       <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-900 text-white pb-32 pt-24 relative overflow-hidden">
         <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-white opacity-5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-indigo-500 opacity-10 rounded-full blur-2xl"></div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <div className="flex justify-center items-center gap-2 text-sm text-indigo-200 mb-6">
+          <div className="flex justify-center items-center gap-2 text-sm text-indigo-200 mb-6 font-bold uppercase tracking-widest">
             <Link to="/" className="hover:text-white transition-colors">
               Home
             </Link>
             <ChevronRight size={14} />
-            <span className="text-white font-medium">Help Center</span>
+            <span className="text-white">Help Center</span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">
             How can we help you?
           </h1>
-          <p className="text-xl text-indigo-100 mb-10">
+          <p className="text-xl text-indigo-100 mb-10 font-medium">
             Search our knowledge base or browse categories below.
           </p>
 
           <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto">
             <div className="relative">
               <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
                 size={24}
               />
               <input
                 type="text"
                 placeholder="Search for articles, guides, or questions..."
-                className="w-full pl-14 pr-6 py-4 rounded-2xl text-gray-900 text-lg shadow-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                className="w-full pl-14 pr-6 py-5 rounded-2xl bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-lg shadow-2xl dark:shadow-none outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <button
                 type="submit"
-                className="absolute right-3 top-1/2 -translate-y-1/2 bg-indigo-600 text-white px-6 py-2 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-indigo-600 text-white px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest hover:bg-indigo-500 transition-colors active:scale-95"
               >
                 Search
               </button>
@@ -118,25 +118,25 @@ const HelpCenter = () => {
           {categories.map((category, index) => (
             <div
               key={index}
-              className="bg-white rounded-2xl p-8 border border-gray-100 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+              className="bg-white dark:bg-slate-900 rounded-3xl p-10 border border-gray-100 dark:border-slate-800 shadow-xl dark:shadow-none hover:shadow-2xl dark:hover:bg-slate-800/80 hover:-translate-y-2 transition-all duration-500"
             >
-              <div className="w-14 h-14 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 mb-6">
-                <category.icon size={28} />
+              <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-8 transition-colors">
+                <category.icon size={32} />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4 tracking-tight transition-colors">
                 {category.title}
               </h3>
-              <p className="text-gray-600 mb-6 min-h-[48px]">
+              <p className="text-gray-600 dark:text-slate-400 mb-8 min-h-[48px] font-medium leading-relaxed transition-colors">
                 {category.description}
               </p>
               <Link
                 to="#"
-                className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-700 transition-colors group"
+                className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-widest text-[10px] hover:text-indigo-700 transition-colors group"
               >
                 Browse {category.articleCount} articles
                 <ArrowRight
-                  size={16}
-                  className="ml-1 group-hover:translate-x-1 transition-transform"
+                  size={14}
+                  className="group-hover:translate-x-1 transition-transform"
                 />
               </Link>
             </div>

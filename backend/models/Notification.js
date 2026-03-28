@@ -13,11 +13,17 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       enum: [
         "booking_confirmed",
+        "booking_accepted",
         "booking_cancelled",
         "booking_completed",
+        "booking_on_the_way",
+        "booking_started",
+        "booking_update",
         "payment",
         "review",
         "system",
+        "announcement",
+        "chat",
       ],
       default: "system",
     },
@@ -27,6 +33,9 @@ const notificationSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+notificationSchema.index({ recipient: 1, createdAt: -1 });
+notificationSchema.index({ recipient: 1, isRead: 1 });
 
 const Notification = mongoose.model("Notification", notificationSchema);
 export default Notification;

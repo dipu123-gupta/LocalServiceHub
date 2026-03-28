@@ -23,25 +23,25 @@ const AdminCategoriesTab = ({
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   return (
-    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 transition-colors">
+      <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 transition-colors">
         <div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             Marketplace Categories
           </h2>
-          <p className="text-slate-500 text-sm font-medium mt-1">
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">
             Manage service categories and their visibility.
           </p>
         </div>
         
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
           <div className="relative w-full sm:w-64 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors" size={18} />
             <input
               placeholder="Search categories..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-3 pl-12 pr-4 text-sm font-bold text-slate-700 outline-none focus:border-indigo-600 focus:bg-white transition-all shadow-inner"
+              className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-100 dark:border-slate-700 rounded-2xl py-3 pl-12 pr-4 text-sm font-bold text-slate-700 dark:text-slate-200 outline-none focus:border-indigo-600 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-950 transition-all shadow-inner"
             />
           </div>
           <Button
@@ -56,7 +56,7 @@ const AdminCategoriesTab = ({
       </div>
 
       {showCatForm && (
-        <div className="p-8 bg-slate-50/50 border-b border-slate-100 animate-in slide-in-from-top-4 duration-300">
+        <div className="p-8 bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-4 duration-300">
           <form
             onSubmit={handleCreateCategory}
             className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end max-w-5xl"
@@ -89,12 +89,12 @@ const AdminCategoriesTab = ({
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
-            <tr className="bg-slate-50/50">
+            <tr className="bg-slate-50/50 dark:bg-slate-800/50">
               {["Visual", "Category Name", "Inventory", "Visibility", "Actions"].map(
                 (h) => (
                   <th
                     key={h}
-                    className="px-8 py-5 text-[0.65rem] font-black text-slate-400 uppercase tracking-[0.2em]"
+                    className="px-8 py-5 text-[0.65rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]"
                   >
                     {h}
                   </th>
@@ -102,25 +102,25 @@ const AdminCategoriesTab = ({
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-50">
+          <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
             {filteredCategories.map((c) => (
-              <tr key={c._id} className="group hover:bg-slate-50/50 transition-colors">
+              <tr key={c._id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                 <td className="px-8 py-6">
-                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
                     {c.icon || "📦"}
                   </div>
                 </td>
                 <td className="px-8 py-6">
-                  <span className="font-black text-slate-900 leading-tight">
+                  <span className="font-black text-slate-900 dark:text-white leading-tight">
                     {c.name}
                   </span>
                 </td>
                 <td className="px-8 py-6">
                   <div className="flex items-center gap-2">
-                    <Badge variant="gray" className="font-black text-[0.6rem] px-2 py-0.5">
+                    <Badge variant="gray" className="font-black text-[0.6rem] px-2 py-0.5 dark:bg-slate-800 dark:text-slate-400">
                       {c.servicesCount || 0}
                     </Badge>
-                    <span className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-wider">Services</span>
+                    <span className="text-[0.65rem] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Services</span>
                   </div>
                 </td>
                 <td className="px-8 py-6">

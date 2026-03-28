@@ -43,8 +43,15 @@ const serviceProviderSchema = new mongoose.Schema(
     },
     availability: {
       days: [String],
-      startTime: String,
-      endTime: String,
+      slots: [
+        {
+          startTime: String, // e.g., "08:00"
+          endTime: String, // e.g., "10:00"
+          isBlocked: { type: Boolean, default: false },
+        }
+      ],
+      generalStartTime: String,
+      generalEndTime: String,
     },
     skills: [
       {

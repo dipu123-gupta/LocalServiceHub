@@ -30,6 +30,7 @@ import Tabs from "../components/common/Tabs";
 import Button from "../components/common/Button";
 import Badge from "../components/common/Badge";
 import Notifications from "./Notifications";
+import { useSocket } from "../store/context/SocketContext";
 
 const Dashboard = () => {
   const { userInfo } = useSelector((s) => s.auth);
@@ -57,6 +58,24 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState(() => {
     return pathToTab[location.pathname] || "overview";
   });
+
+  const socket = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("newNotification", (notification) => {
+      // Refresh bookings/wallet if notification is about a booking update
+      if (notification.type?.startsWith("booking_")) {
+        fetchBookings();
+        fetchWallet();
+      }
+    });
+
+    return () => {
+      socket.off("newNotification");
+    };
+  }, [socket, activeTab]);
 
   // Sync state with URL changes
   useEffect(() => {
@@ -241,7 +260,7 @@ const Dashboard = () => {
   if (!userInfo) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       {/* Header Section */}
       <div className="bg-gradient-to-br from-indigo-950 to-indigo-700 pt-16 pb-20 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
@@ -274,7 +293,7 @@ const Dashboard = () => {
 
       <div className="max-w-6xl mx-auto px-6 -mt-10 mb-20">
         {/* Navigation Tabs */}
-        <div className="bg-white rounded-[2rem] p-3 shadow-xl shadow-indigo-100/50 border border-indigo-50/50 mb-10 overflow-x-auto">
+        <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-3 shadow-xl shadow-indigo-100/50 dark:shadow-none border border-indigo-50/50 dark:border-slate-800 mb-10 overflow-x-auto transition-colors duration-300">
           <Tabs
             tabs={tabs}
             activeTab={activeTab}

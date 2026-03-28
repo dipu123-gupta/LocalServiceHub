@@ -36,7 +36,7 @@ const About = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
       <PageHeader
         title="About HomeServiceHub"
         breadcrumbs={breadcrumbs}
@@ -46,39 +46,39 @@ const About = () => {
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
-            <p className="text-lg text-gray-600 mb-4 leading-relaxed">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 transition-colors">Our Story</h2>
+            <p className="text-lg text-gray-600 dark:text-slate-400 mb-4 leading-relaxed transition-colors">
               Founded with the vision to simplify home maintenance,
               HomeServiceHub began as a small initiative to bridge the gap
               between skilled local professionals and homeowners in need of
               reliable services.
             </p>
-            <p className="text-lg text-gray-600 mb-4 leading-relaxed">
+            <p className="text-lg text-gray-600 dark:text-slate-400 mb-4 leading-relaxed transition-colors">
               Over the years, we've grown into a comprehensive marketplace,
               meticulously vetting each service provider to ensure our users
               receive nothing but the best. From humble beginnings to a trusted
               platform, our journey has been fueled by a commitment to quality
               and customer satisfaction.
             </p>
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-lg text-gray-600 dark:text-slate-400 leading-relaxed transition-colors">
               Today, we are proud to handle thousands of service requests daily,
               continually innovating to make the process as seamless and
               transparent as possible.
             </p>
           </div>
           <div className="relative">
-            <div className="aspect-square bg-indigo-100 rounded-3xl overflow-hidden shadow-xl">
+            <div className="aspect-square bg-indigo-100 dark:bg-indigo-900/30 rounded-3xl overflow-hidden shadow-xl transition-colors">
               <img
                 src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                 alt="Our team working"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hidden sm:block">
-              <div className="text-4xl font-bold text-indigo-600 mb-1">
+            <div className="absolute -bottom-6 -left-6 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-slate-800 hidden sm:block transition-all">
+              <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-1 transition-colors">
                 10k+
               </div>
-              <div className="text-gray-600 font-medium">
+              <div className="text-gray-600 dark:text-slate-400 font-medium transition-colors">
                 Services Delivered
               </div>
             </div>
@@ -86,7 +86,7 @@ const About = () => {
         </div>
       </section>
 
-      <section className="py-20 bg-gray-50 px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-gray-50 dark:bg-slate-900/50 px-4 sm:px-6 lg:px-8 transition-colors">
         <div className="max-w-7xl mx-auto">
           <SectionTitle
             title="Our Core Values"

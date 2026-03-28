@@ -62,6 +62,22 @@ const serviceSchema = new mongoose.Schema(
         trim: true,
       },
     ],
+    inclusions: [
+      {
+        type: String,
+      },
+    ],
+    exclusions: [
+      {
+        type: String,
+      },
+    ],
+    faqs: [
+      {
+        question: { type: String, required: true },
+        answer: { type: String, required: true },
+      },
+    ],
   },
   {
     timestamps: true,

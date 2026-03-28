@@ -21,6 +21,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSocket } from "../store/context/SocketContext";
 import NotificationBell from "./NotificationBell";
 import LocationSelector from "./LocationSelector";
+import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -110,7 +111,7 @@ const Navbar = () => {
         )}
       </AnimatePresence>
 
-      <nav className="sticky top-0 z-[60] bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm px-4 lg:px-8 transition-all duration-300">
+      <nav className="sticky top-0 z-[60] bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-slate-800 shadow-sm px-4 lg:px-8 transition-all duration-300">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-20">
           {/* Logo & Location */}
           <div className="flex items-center gap-6">
@@ -118,8 +119,8 @@ const Navbar = () => {
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center text-xl shadow-lg shadow-indigo-200 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
                 🏠
               </div>
-              <span className="text-2xl font-black text-slate-900 tracking-tight hidden lg:block group-hover:text-indigo-600 transition-colors">
-                Local<span className="text-indigo-600 group-hover:text-slate-900 transition-colors">ServiceHub</span>
+              <span className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight hidden sm:block group-hover:text-indigo-600 transition-colors">
+                Local<span className="text-indigo-600 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">ServiceHub</span>
               </span>
             </Link>
             <div className="hidden md:block">
@@ -131,7 +132,7 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-8">
             <Link
               to="/services"
-              className="text-gray-600 hover:text-indigo-600 font-medium transition-colors"
+              className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors"
             >
               Services
             </Link>
@@ -149,17 +150,18 @@ const Navbar = () => {
                 placeholder="Search services..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-4 py-2.5 w-64 xl:w-80 rounded-[1.25rem] border-2 border-transparent bg-gray-50/80 hover:bg-gray-100/80 focus:bg-white focus:outline-none focus:border-indigo-100 focus:ring-4 focus:ring-indigo-50/50 transition-all text-sm font-semibold placeholder:text-gray-400"
+                className="pl-12 pr-4 py-2.5 w-64 xl:w-80 rounded-[1.25rem] border-2 border-transparent bg-gray-50/80 dark:bg-slate-800/80 hover:bg-gray-100/80 dark:hover:bg-slate-700/80 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-indigo-100 dark:focus:border-indigo-900 focus:ring-4 focus:ring-indigo-50/50 dark:focus:ring-indigo-900/50 transition-all text-sm font-semibold placeholder:text-gray-400 dark:text-white"
               />
             </form>
 
+            <ThemeToggle />
             {userInfo && <NotificationBell />}
 
             {userInfo ? (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropOpen(!isDropOpen)}
-                  className="flex items-center gap-2.5 bg-white border border-slate-100 rounded-2xl pl-1.5 pr-4 py-1.5 hover:shadow-xl hover:shadow-indigo-100/50 hover:border-indigo-100 transition-all duration-300"
+                  className="flex items-center gap-2.5 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl pl-1.5 pr-4 py-1.5 hover:shadow-xl hover:shadow-indigo-100/50 dark:hover:shadow-indigo-900/50 hover:border-indigo-100 dark:hover:border-indigo-900 transition-all duration-300"
                 >
                   <div className="w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center text-white text-sm font-black shadow-md">
                     {userInfo.profileImage ? (
@@ -178,8 +180,8 @@ const Navbar = () => {
                     {!userInfo.profileImage && userInfo.name?.charAt(0).toUpperCase()}
                   </div>
                   <div className="text-left hidden sm:block">
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">Account</p>
-                    <p className="text-sm font-bold text-slate-900 leading-none">
+                    <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-0.5">Account</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white leading-none">
                       {userInfo.name?.split(" ")[0]}
                     </p>
                   </div>
@@ -302,7 +304,7 @@ const Navbar = () => {
               <div className="hidden sm:flex items-center gap-3">
                 <Link
                   to="/login"
-                  className="text-sm font-bold text-gray-700 hover:text-indigo-600 px-3 transition-colors"
+                  className="text-sm font-bold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 px-3 transition-colors"
                 >
                   Login
                 </Link>
@@ -333,7 +335,7 @@ const Navbar = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="lg:hidden bg-white/95 backdrop-blur-xl border-b border-gray-100 absolute w-full z-[55] shadow-2xl p-6"
+            className="lg:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-gray-100 dark:border-slate-800 absolute w-full z-[55] shadow-2xl p-6"
           >
             <div className="flex flex-col gap-3">
               <form onSubmit={handleSearch} className="mb-4 relative group">
@@ -346,20 +348,21 @@ const Navbar = () => {
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-transparent bg-gray-50/80 focus:bg-white focus:outline-none focus:border-indigo-100 focus:ring-4 focus:ring-indigo-50 transition-all font-semibold"
+                  className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-transparent bg-gray-50/80 dark:bg-slate-800/80 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-indigo-100 dark:focus:border-indigo-900 focus:ring-4 focus:ring-indigo-50 dark:focus:ring-indigo-900/50 transition-all font-semibold dark:text-white"
                 />
               </form>
 
               <Link
                 to="/services"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-4 flex items-center justify-between font-black text-slate-800 hover:bg-indigo-50 hover:text-indigo-600 rounded-2xl transition-all group"
+                className="p-5 flex items-center justify-between font-black text-slate-800 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-2xl transition-all group active:scale-95"
               >
                 <span>Services</span>
-                <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                  <Menu size={16} />
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                  <ChevronDown size={18} className="-rotate-90" />
                 </div>
               </Link>
+
 
               {!userInfo && (
                 <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-3">

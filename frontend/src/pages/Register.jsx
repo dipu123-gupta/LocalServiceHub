@@ -139,7 +139,7 @@ const Register = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="bg-white/[0.03] backdrop-blur-3xl rounded-[3rem] p-8 md:p-12 border border-white/10 shadow-2xl relative"
+          className="bg-white/[0.03] backdrop-blur-3xl rounded-[2.5rem] p-6 md:p-12 border border-white/10 shadow-2xl relative"
         >
           {error && (
             <motion.div 

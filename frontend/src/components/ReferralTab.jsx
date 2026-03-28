@@ -67,7 +67,7 @@ const ReferralTab = () => {
       {/* Hero Banner */}
       <motion.div 
         variants={itemVariants}
-        className="relative rounded-[3rem] p-12 md:p-16 overflow-hidden bg-slate-900 group"
+        className="relative rounded-[3rem] p-12 md:p-16 overflow-hidden bg-slate-900 dark:bg-slate-950 group"
       >
         {/* Animated Background Elements */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600/30 rounded-full blur-[100px] -mr-32 -mt-32 animate-pulse" />
@@ -122,23 +122,23 @@ const ReferralTab = () => {
         {/* Sharing Controls */}
         <motion.div 
           variants={itemVariants}
-          className="lg:col-span-8 bg-white rounded-[3rem] p-10 md:p-14 border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden"
+          className="lg:col-span-8 bg-white dark:bg-slate-900 rounded-[3rem] p-10 md:p-14 border border-slate-100 dark:border-slate-800 shadow-xl dark:shadow-none shadow-slate-200/40 relative overflow-hidden transition-colors duration-300"
         >
           <div className="flex items-center gap-3 mb-10">
-             <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white">
+             <div className="w-12 h-12 rounded-2xl bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white transition-colors">
                 <Share2 size={24} />
              </div>
-             <h3 className="text-2xl font-black text-slate-900 tracking-tight">Your Referral Hub</h3>
+             <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight transition-colors">Your Referral Hub</h3>
           </div>
 
           <div className="grid gap-10">
             {/* Referral Code */}
             <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Universal Referral Code</label>
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1 transition-colors">Universal Referral Code</label>
               <div className="relative group">
-                <div className="absolute inset-0 bg-indigo-600/5 rounded-3xl border-2 border-dashed border-indigo-200 group-hover:border-indigo-400 transition-colors" />
+                <div className="absolute inset-0 bg-indigo-600/5 dark:bg-indigo-900/10 rounded-3xl border-2 border-dashed border-indigo-200 dark:border-indigo-800 group-hover:border-indigo-400 transition-colors" />
                 <div className="relative px-8 py-10 flex flex-col items-center gap-6">
-                  <span className="text-5xl font-black text-indigo-600 tracking-[0.2em]">
+                  <span className="text-5xl font-black text-indigo-600 dark:text-indigo-400 tracking-[0.2em] transition-colors">
                     {userInfo?.referralCode || "GENERATING..."}
                   </span>
                   <Button
@@ -153,15 +153,15 @@ const ReferralTab = () => {
             </div>
 
             {/* Direct Link */}
-            <div className="space-y-4 pt-6 border-t border-slate-50">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Direct Invitation Link</label>
+            <div className="space-y-4 pt-6 border-t border-slate-50 dark:border-slate-800 transition-colors">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 ml-1 transition-colors">Direct Invitation Link</label>
               <div className="flex gap-4">
-                <div className="flex-1 h-14 bg-slate-50 border border-slate-200 rounded-2xl px-6 flex items-center overflow-hidden">
-                  <span className="text-sm font-medium text-slate-500 truncate">{referralLink}</span>
+                <div className="flex-1 h-14 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 flex items-center overflow-hidden transition-colors">
+                  <span className="text-sm font-medium text-slate-500 dark:text-slate-400 truncate transition-colors">{referralLink}</span>
                 </div>
                 <button
                   onClick={handleCopyLink}
-                  className="w-14 h-14 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-900 hover:border-indigo-200 hover:bg-indigo-50 transition-all active:scale-95"
+                  className="w-14 h-14 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-center text-slate-900 dark:text-white hover:border-indigo-200 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all active:scale-95"
                 >
                   <Share2 size={20} />
                 </button>
@@ -170,7 +170,7 @@ const ReferralTab = () => {
           </div>
 
           {/* How it works */}
-          <div className="mt-14 p-8 bg-slate-900 rounded-[2.5rem] text-white">
+          <div className="mt-14 p-8 bg-slate-900 dark:bg-slate-950 rounded-[2.5rem] text-white transition-colors">
              <h4 className="flex items-center gap-3 text-lg font-black mb-6">
                 <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
                    <CheckCircle size={16} className="text-indigo-400" />
@@ -185,7 +185,7 @@ const ReferralTab = () => {
                 ].map((item, i) => (
                   <div key={i} className="space-y-2">
                      <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{item.step}</span>
-                     <p className="text-sm font-medium text-slate-400 leading-tight">{item.text}</p>
+                     <p className="text-sm font-medium text-slate-400 dark:text-slate-500 leading-tight transition-colors">{item.text}</p>
                   </div>
                 ))}
              </div>
@@ -197,36 +197,36 @@ const ReferralTab = () => {
           variants={itemVariants}
           className="lg:col-span-4 space-y-6"
         >
-          <div className="bg-emerald-50 border border-emerald-100 rounded-[2.5rem] p-10 text-center relative overflow-hidden group">
-             <div className="absolute top-0 right-0 p-6 text-emerald-100 group-hover:rotate-12 transition-transform duration-700">
+          <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 rounded-[2.5rem] p-10 text-center relative overflow-hidden group transition-colors">
+             <div className="absolute top-0 right-0 p-6 text-emerald-100 dark:text-emerald-900/20 group-hover:rotate-12 transition-transform duration-700">
                 <Users size={80} />
              </div>
              <div className="relative">
-                <div className="text-6xl font-black text-emerald-600 mb-2 leading-none tracking-tight">
+                <div className="text-6xl font-black text-emerald-600 dark:text-emerald-400 mb-2 leading-none tracking-tight transition-colors">
                   {loading ? "..." : stats.referredCount}
                 </div>
-                <h4 className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Friends Onboarded</h4>
-                <p className="text-xs font-medium text-emerald-800/40 mt-4 italic">Bring your crew, earn more.</p>
+                <h4 className="text-[10px] font-black text-emerald-700 dark:text-emerald-500 uppercase tracking-widest transition-colors">Friends Onboarded</h4>
+                <p className="text-xs font-medium text-emerald-800/40 dark:text-emerald-500/40 mt-4 italic transition-colors">Bring your crew, earn more.</p>
              </div>
           </div>
 
-          <div className="bg-indigo-50 border border-indigo-100 rounded-[2.5rem] p-10 text-center relative overflow-hidden group">
-             <div className="absolute top-0 right-0 p-6 text-indigo-100 group-hover:rotate-12 transition-transform duration-700">
+          <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-[2.5rem] p-10 text-center relative overflow-hidden group transition-colors">
+             <div className="absolute top-0 right-0 p-6 text-indigo-100 dark:text-indigo-900/20 group-hover:rotate-12 transition-transform duration-700 transition-colors">
                 <Gift size={80} />
              </div>
              <div className="relative">
-                <div className="text-6xl font-black text-indigo-600 mb-2 leading-none tracking-tight">
+                <div className="text-6xl font-black text-indigo-600 dark:text-indigo-400 mb-2 leading-none tracking-tight transition-colors">
                   {loading ? "..." : `₹${stats.totalRewards}`}
                 </div>
-                <h4 className="text-[10px] font-black text-indigo-700 uppercase tracking-widest">Rewards Realized</h4>
-                <p className="text-xs font-medium text-indigo-800/40 mt-4 italic">Passive earnings incoming.</p>
+                <h4 className="text-[10px] font-black text-indigo-700 dark:text-indigo-500 uppercase tracking-widest transition-colors">Rewards Realized</h4>
+                <p className="text-xs font-medium text-indigo-800/40 dark:text-indigo-500/40 mt-4 italic transition-colors">Passive earnings incoming.</p>
              </div>
           </div>
 
-          <div className="bg-slate-50 border border-slate-100 rounded-[2.5rem] p-8">
-             <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Pro Referral Tip</h5>
-             <p className="text-sm font-medium text-slate-600 leading-relaxed italic">
-               "Share your link in neighborhood groups or on social to reach more friends faster!"
+          <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-8 transition-colors">
+             <h5 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-4 transition-colors">Pro Referral Tip</h5>
+             <p className="text-sm font-medium text-slate-600 dark:text-slate-400 leading-relaxed italic transition-colors">
+                "Share your link in neighborhood groups or on social to reach more friends faster!"
              </p>
           </div>
         </motion.div>

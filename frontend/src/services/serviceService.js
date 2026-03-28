@@ -22,4 +22,8 @@ export const serviceService = {
     const response = await api.delete(`/services/${id}`);
     return response.data;
   },
+  getCategories: async () => {
+    const response = await api.get("/categories");
+    return response.data;
+  },
 };

@@ -9,8 +9,8 @@ const ContentSection = ({ title, children }) => (
     viewport={{ once: true }}
     className="mb-12"
   >
-    <h2 className="text-2xl font-bold text-gray-900 mb-4">{title}</h2>
-    <div className="prose prose-indigo max-w-none text-gray-600">
+    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-6 tracking-tight transition-colors">{title}</h2>
+    <div className="prose prose-indigo max-w-none text-slate-600 dark:text-slate-400 font-medium leading-relaxed transition-colors">
       {children}
     </div>
   </motion.section>
@@ -20,7 +20,7 @@ const RefundPolicy = () => {
   const breadcrumbs = [{ label: "Refund Policy" }];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
       <PageHeader
         title="Refund Policy"
         breadcrumbs={breadcrumbs}
@@ -28,7 +28,7 @@ const RefundPolicy = () => {
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12">
+        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 p-8 md:p-14 transition-colors">
           <ContentSection title="Satisfaction Guarantee">
             <p>
               At HomeServiceHub, we stand behind the quality of the services
@@ -38,8 +38,8 @@ const RefundPolicy = () => {
           </ContentSection>
 
           <ContentSection title="Eligibility for Refunds">
-            <p>You may be eligible for a full or partial refund if:</p>
-            <ul>
+            <p className="mb-6">You may be eligible for a full or partial refund if:</p>
+            <ul className="space-y-4">
               <li>
                 The service professional failed to show up for the confirmed
                 booking.
@@ -60,8 +60,8 @@ const RefundPolicy = () => {
           </ContentSection>
 
           <ContentSection title="How to Request a Refund">
-            <p>To initiate a refund request, you must:</p>
-            <ol>
+            <p className="mb-6">To initiate a refund request, you must:</p>
+            <ol className="space-y-4">
               <li>
                 Contact our support team within <strong>48 hours</strong> of the
                 service completion time.
@@ -72,15 +72,15 @@ const RefundPolicy = () => {
               </li>
               <li>Provide a detailed description of the issue.</li>
             </ol>
-            <p>
+            <p className="mt-8">
               Our Trust & Safety team will review the claim, speak with the
               service provider, and issue a resolution within 3-5 business days.
             </p>
           </ContentSection>
 
           <ContentSection title="Non-Refundable Circumstances">
-            <p>Refunds will not be issued if:</p>
-            <ul>
+            <p className="mb-6">Refunds will not be issued if:</p>
+            <ul className="space-y-4">
               <li>
                 The service issue was reported more than 48 hours after
                 completion.

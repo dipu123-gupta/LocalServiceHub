@@ -16,11 +16,9 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import api from "@/utils/api";
-import { useSelector } from "react-redux";
-import io from "socket.io-client";
-
 import { useLocation } from "react-router-dom";
+import { useSocket } from "../../store/context/SocketContext";
+import { useVideoCall } from "../../store/context/VideoCallContext";
 
 const Messages = () => {
   const location = useLocation();
@@ -31,53 +29,59 @@ const Messages = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
-  const socket = useRef(null);
+  const { callUser } = useVideoCall();
+  const socket = useSocket();
   const messagesEndRef = useRef(null);
   const [showChatMobile, setShowChatMobile] = useState(false);
 
   useEffect(() => {
     fetchChats();
-    setupSocket();
-    return () => socket.current?.disconnect();
   }, []);
 
   useEffect(() => {
-    // If we're coming from another page with a recipientId
-    if (location.state?.recipientId && chats.length > 0) {
-      const existingChat = chats.find(c => c.user._id === location.state.recipientId);
-      if (existingChat) {
-        setActiveChat(existingChat);
-        fetchMessages(existingChat.user._id);
-        setShowChatMobile(true);
-      } else {
-        // Virtual chat for new recipient - only if not in chat list
-        // We'll need to fetch the user's name first or just assume it's coming from state
-        // For now, let's just create a mock chat object
-        const mockChat = {
-          user: { _id: location.state.recipientId, name: location.state.recipientName || "Customer" },
-          lastMessage: "",
-          isNew: true
-        };
-        setActiveChat(mockChat);
-        setMessages([]);
-        setShowChatMobile(true);
-      }
-    }
-  }, [location.state, chats]);
+    if (!socket) return;
 
-  const setupSocket = () => {
-    // Note: Project currently uses emitToUser with 'newMessage' event
-    socket.current = io(window.location.origin.replace("5173", "5001"));
-    socket.current.emit("setup", userInfo);
-    
-    socket.current.on("newMessage", (msg) => {
+    socket.on("newMessage", (msg) => {
       // If it's from the person we're talking to or we're the sender
       if (activeChat && (msg.sender._id === activeChat.user._id || msg.sender._id === userInfo._id)) {
         setMessages((prev) => [...prev, msg]);
       }
       fetchChats(); // Always refresh list for preview
     });
-  };
+
+    return () => {
+      socket.off("newMessage");
+    };
+  }, [activeChat, socket]);
+
+  useEffect(() => {
+    // If we're coming from another page with a recipientId
+    if (location.state?.recipientId && !loading) {
+      const { recipientId, recipientName } = location.state;
+      
+      const existingChat = chats.find(c => c.user._id === recipientId);
+      if (existingChat) {
+        if (activeChat?.user?._id !== recipientId) {
+          setActiveChat(existingChat);
+          fetchMessages(existingChat.user._id);
+        }
+        setShowChatMobile(true);
+      } else {
+        // Virtual chat for new recipient
+        if (activeChat?.user?._id !== recipientId) {
+          const mockChat = {
+            user: { _id: recipientId, name: recipientName || "Customer" },
+            lastMessage: "",
+            isNew: true
+          };
+          setActiveChat(mockChat);
+          setMessages([]);
+        }
+        setShowChatMobile(true);
+      }
+    }
+  }, [location.state, chats, loading]);
+
 
   const fetchChats = async () => {
     try {
@@ -202,11 +206,26 @@ const Messages = () => {
                     <h3 className="text-lg font-black text-slate-900 tracking-tight">
                       {activeChat.user.name}
                     </h3>
-                    {/* ... */}
+                    <div className="flex items-center gap-1.5 text-[0.65rem] font-bold text-emerald-500 uppercase tracking-widest mt-0.5">
+                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                      Online
+                    </div>
                   </div>
                 </div>
               </div>
-              {/* ... buttons same ... */}
+              
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => callUser(activeChat.user._id, activeChat.user.name)}
+                  className="px-6 py-3 bg-indigo-600 text-white rounded-2xl text-xs font-black shadow-lg shadow-indigo-100 hover:bg-slate-900 transition-all flex items-center gap-2 group active:scale-95"
+                >
+                  <Video size={16} className="group-hover:rotate-12 transition-transform" />
+                  Video Call
+                </button>
+                <button className="p-3 text-slate-400 hover:text-slate-900 transition-colors">
+                  <MoreVertical size={20} />
+                </button>
+              </div>
             </header>
 
             {/* Messages Content */}

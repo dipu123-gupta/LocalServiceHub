@@ -1,4 +1,7 @@
 import crypto from "crypto";
+import { OAuth2Client } from "google-auth-library";
+import admin from "firebase-admin";
+import mongoose from "mongoose";
 import generateToken from "../utils/generateToken.js";
 import sendEmail from "../utils/sendEmail.js";
 import Wallet from "../models/Wallet.js";
@@ -110,7 +113,26 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email }).select("+password");
 
-  if (user && (await user.matchPassword(password))) {
+  if (!user) {
+    res.status(401);
+    throw new Error("Invalid email or password");
+  }
+
+  // Check if user has a password (might be a Google account)
+  if (!user.password && user.authProvider === "google") {
+    res.status(401);
+    throw new Error(
+      "This account uses Google Sign-In. Please log in with Google.",
+    );
+  }
+
+  if (await user.matchPassword(password)) {
+    // Check if user is blocked
+    if (user.isBlocked) {
+      res.status(403);
+      throw new Error("Your account has been blocked. Please contact support.");
+    }
+
     generateToken(res, user._id);
 
     const populatedUser = await User.findById(user._id).populate(
@@ -334,6 +356,14 @@ const updatePassword = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
+  // Check if user has a password (might be a Google account)
+  if (!user.password && user.authProvider === "google") {
+    res.status(400);
+    throw new Error(
+      "This account uses Google Sign-In. You cannot change your password here.",
+    );
+  }
+
   // Check current password
   const isMatch = await user.matchPassword(currentPassword);
 
@@ -355,6 +385,106 @@ const updatePassword = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Google Sign-In / Sign-Up
+// @route   POST /api/auth/google
+// @access  Public
+const googleAuth = asyncHandler(async (req, res) => {
+  const { idToken } = req.body;
+
+  if (!idToken) {
+    res.status(400);
+    throw new Error("Google ID token is required");
+  }
+
+  console.log("🚀 [GoogleAuth] Received Token Verification Request");
+
+  try {
+    let googleId, email, name, picture;
+
+    // 1. Try Firebase Admin if available (Most secure)
+    if (admin.apps.length > 0) {
+      console.log("🔹 Using Firebase Admin for verification...");
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      googleId = decodedToken.uid;
+      email = decodedToken.email;
+      name = decodedToken.name;
+      picture = decodedToken.picture;
+    } else {
+      // 2. Fallback to google-auth-library (Requires audience to be Project ID for Firebase tokens)
+      console.log("🔸 Firebase Admin not ready. Falling back to google-auth-library...");
+      const client = new OAuth2Client();
+      const ticket = await client.verifyIdToken({
+        idToken,
+        // For Firebase ID tokens, the audience IS the project ID
+        audience: process.env.VITE_FIREBASE_PROJECT_ID || process.env.GOOGLE_CLIENT_ID || undefined,
+      });
+      const payload = ticket.getPayload();
+      googleId = payload.sub;
+      email = payload.email;
+      name = payload.name;
+      picture = payload.picture;
+    }
+
+    console.log(`✅ [GoogleAuth] Token Verified for: ${email}`);
+
+    // Check MongoDB Connection State
+    if (mongoose.connection.readyState !== 1) {
+      console.error("❌ MongoDB not connected! State:", mongoose.connection.readyState);
+      res.status(503);
+      throw new Error("Database connection is currently unavailable. Please try again in a few seconds.");
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+
+    if (user) {
+      console.log(`🔹 Existing user found: ${user.email}`);
+      // link Google if not already
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.authProvider = user.authProvider === "local" ? "local" : "google";
+        if (picture && (!user.profileImage || !user.profileImage.includes("cloudinary"))) {
+          user.profileImage = picture;
+        }
+        user.isEmailVerified = true;
+        await user.save({ validateBeforeSave: false });
+      }
+    } else {
+      console.log(`🆕 Creating new user: ${email}`);
+      user = await User.create({
+        name,
+        email,
+        googleId,
+        authProvider: "google",
+        profileImage: picture || undefined,
+        isEmailVerified: true,
+        role: "user",
+      });
+
+      await Wallet.create({ user: user._id });
+    }
+
+    generateToken(res, user._id);
+
+    const populatedUser = await User.findById(user._id).populate("activeSubscription");
+
+    res.status(200).json({
+      _id: populatedUser._id,
+      name: populatedUser.name,
+      email: populatedUser.email,
+      role: populatedUser.role,
+      profileImage: populatedUser.profileImage,
+      activeSubscription: populatedUser.activeSubscription,
+      isEmailVerified: populatedUser.isEmailVerified,
+      authProvider: populatedUser.authProvider,
+    });
+  } catch (error) {
+    console.error("🔴 [GoogleAuth Error]:", error.message);
+    res.status(error.statusCode || 401);
+    throw new Error(error.message || "Google authentication failed.");
+  }
+});
+
 export {
   registerUser,
   loginUser,
@@ -365,4 +495,5 @@ export {
   resetPassword,
   verifyEmail,
   updatePassword,
+  googleAuth,
 };

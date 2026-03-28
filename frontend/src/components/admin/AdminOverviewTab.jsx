@@ -3,12 +3,12 @@ import { motion } from "framer-motion";
 
 export const StatCard = ({ icon, label, value, description, variant = "indigo", onClick }) => {
   const variants = {
-    indigo: "bg-indigo-500/10 text-indigo-600 border-indigo-50",
-    emerald: "bg-emerald-500/10 text-emerald-600 border-emerald-50",
-    amber: "bg-amber-500/10 text-amber-600 border-amber-50",
-    violet: "bg-violet-500/10 text-violet-600 border-violet-50",
-    rose: "bg-rose-500/10 text-rose-600 border-rose-50",
-    cyan: "bg-cyan-500/10 text-cyan-600 border-cyan-50",
+    indigo: "bg-indigo-500/10 text-indigo-600 border-indigo-50 dark:border-indigo-900/20",
+    emerald: "bg-emerald-500/10 text-emerald-600 border-emerald-50 dark:border-emerald-900/20",
+    amber: "bg-amber-500/10 text-amber-600 border-amber-50 dark:border-amber-900/20",
+    violet: "bg-violet-500/10 text-violet-600 border-violet-50 dark:border-violet-900/20",
+    rose: "bg-rose-500/10 text-rose-600 border-rose-50 dark:border-rose-900/20",
+    cyan: "bg-cyan-500/10 text-cyan-600 border-cyan-50 dark:border-cyan-900/20",
   };
 
   return (
@@ -16,27 +16,27 @@ export const StatCard = ({ icon, label, value, description, variant = "indigo", 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       onClick={onClick}
-      className={`bg-white rounded-3xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-100/40 transition-all group relative overflow-hidden ${onClick ? 'cursor-pointer active:scale-95' : ''}`}
+      className={`bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-indigo-100/40 dark:hover:shadow-none transition-all group relative overflow-hidden ${onClick ? 'cursor-pointer active:scale-95' : ''}`}
     >
       <div className="flex items-center gap-5 relative z-10">
         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300 border ${variants[variant]}`}>
           {icon}
         </div>
         <div>
-          <div className="text-2xl font-black text-slate-900 leading-none mb-1 tracking-tighter">
+          <div className="text-2xl font-black text-slate-900 dark:text-white leading-none mb-1 tracking-tighter">
             {value}
           </div>
-          <div className="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest">
+          <div className="text-[0.65rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
             {label}
           </div>
         </div>
       </div>
       {description && (
-        <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between relative z-10">
-          <span className="text-[0.7rem] font-bold text-slate-500 uppercase tracking-wider italic opacity-60">
+        <div className="mt-4 pt-4 border-t border-slate-50 dark:border-slate-800 flex items-center justify-between relative z-10">
+          <span className="text-[0.7rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider italic opacity-60">
             {description}
           </span>
-          <ArrowUpRight size={14} className="text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <ArrowUpRight size={14} className="text-slate-300 dark:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
       )}
       <div className={`absolute -right-6 -bottom-6 w-24 h-24 rounded-full opacity-0 group-hover:opacity-10 transition-opacity blur-2xl ${variants[variant].split(' ')[0]}`} />
@@ -89,14 +89,14 @@ const AdminOverviewTab = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Recent Users List */}
-        <div className="lg:col-span-7 bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/40">
+        <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none transition-colors">
           <div className="flex items-center justify-between mb-10">
-            <h3 className="text-2xl font-black text-slate-900 tracking-tighter italic">
+            <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter italic">
               Recent Onboarding
             </h3>
             <button 
               onClick={() => setActiveTab("users")}
-              className="text-[10px] font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-[0.2em] px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-xl transition-all active:scale-95"
+              className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 uppercase tracking-[0.2em] px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/50 rounded-xl transition-all active:scale-95"
             >
               System View All
             </button>
@@ -109,32 +109,32 @@ const AdminOverviewTab = ({
               .map((u) => (
                 <div
                   key={u._id}
-                  className="flex items-center justify-between p-5 rounded-3xl bg-slate-50/50 border border-slate-100 group hover:bg-white hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500"
+                  className="flex items-center justify-between p-5 rounded-3xl bg-slate-50/50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 group hover:bg-white dark:hover:bg-slate-800 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500"
                 >
                   <div className="flex items-center gap-5">
                     <div className="relative">
                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-500">
                          {u.name[0].toUpperCase()}
                        </div>
-                       <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-lg bg-white border border-slate-100 flex items-center justify-center shadow-lg">
+                       <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center shadow-lg">
                           <div className={`w-2 h-2 rounded-full ${u.role === 'admin' ? 'bg-rose-500' : u.role === 'provider' ? 'bg-violet-500' : 'bg-emerald-500'}`} />
                        </div>
                     </div>
                     <div>
-                      <div className="text-lg font-black text-slate-900 tracking-tight group-hover:text-indigo-600 transition-colors">
+                      <div className="text-lg font-black text-slate-900 dark:text-white tracking-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                         {u.name}
                       </div>
-                      <div className="text-xs font-bold text-slate-400">
+                      <div className="text-xs font-bold text-slate-400 dark:text-slate-500">
                         {u.email}
                       </div>
                     </div>
                   </div>
                   <div className={`text-[9px] font-black uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-xl border-2 ${
                     u.role === "admin" 
-                      ? "bg-rose-50 text-rose-600 border-rose-100/50" 
+                      ? "bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border-rose-100/50 dark:border-rose-900/30" 
                       : u.role === "provider" 
-                        ? "bg-violet-50 text-violet-600 border-violet-100/50" 
-                        : "bg-emerald-50 text-emerald-600 border-emerald-100/50"
+                        ? "bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 border-violet-100/50 dark:border-violet-900/30" 
+                        : "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-900/30"
                   }`}>
                     {u.role}
                   </div>
@@ -144,7 +144,7 @@ const AdminOverviewTab = ({
         </div>
 
         {/* Global Performance Insights */}
-        <div className="lg:col-span-5 bg-slate-900 rounded-[3rem] p-12 text-white relative overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.4)]">
+        <div className="lg:col-span-5 bg-slate-900 rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 text-white relative overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.4)]">
           <div className="relative z-10 h-full flex flex-col">
             <div className="flex items-center gap-2 mb-2">
                <TrendingUp size={16} className="text-indigo-400" />

@@ -29,7 +29,7 @@ export const registerSchema = Joi.object({
   name: Joi.string().required().min(2).max(50),
   email: Joi.string().email().required(),
   password: Joi.string().required().min(6),
-  role: Joi.string().valid("user", "provider", "admin"),
+  role: Joi.string().valid("user", "provider"),
   referralCode: Joi.string().allow("", null),
 });
 

@@ -9,8 +9,8 @@ const ContentSection = ({ title, children }) => (
     viewport={{ once: true }}
     className="mb-12"
   >
-    <h2 className="text-2xl font-bold text-gray-900 mb-4">{title}</h2>
-    <div className="prose prose-indigo max-w-none text-gray-600">
+    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-6 tracking-tight transition-colors">{title}</h2>
+    <div className="prose prose-indigo max-w-none text-slate-600 dark:text-slate-400 font-medium leading-relaxed transition-colors">
       {children}
     </div>
   </motion.section>
@@ -20,7 +20,7 @@ const TermsOfService = () => {
   const breadcrumbs = [{ label: "Terms of Service" }];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
       <PageHeader
         title="Terms of Service"
         breadcrumbs={breadcrumbs}
@@ -28,7 +28,7 @@ const TermsOfService = () => {
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12">
+        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 p-8 md:p-14 transition-colors">
           <ContentSection title="1. Agreement to Terms">
             <p>
               By accessing or using HomeServiceHub, you agree to be bound by
@@ -39,13 +39,13 @@ const TermsOfService = () => {
           </ContentSection>
 
           <ContentSection title="2. Platform Functionality">
-            <p>
+            <p className="mb-6">
               HomeServiceHub operates as a marketplace connecting individuals
               seeking home services ("Users") with independent professionals
               providing those services ("Providers"). We do not directly provide
               the home services, nor do we employ the Providers.
             </p>
-            <ul>
+            <ul className="space-y-4">
               <li>
                 We perform background checks on Providers but cannot guarantee
                 their actions.
@@ -62,7 +62,7 @@ const TermsOfService = () => {
           </ContentSection>
 
           <ContentSection title="3. User Accounts">
-            <p>
+            <p className="mb-6">
               When you create an account with us, you must provide accurate,
               complete, and current information. Failure to do so constitutes a
               breach of the Terms, which may result in immediate termination of
@@ -75,8 +75,8 @@ const TermsOfService = () => {
           </ContentSection>
 
           <ContentSection title="4. Prohibited Uses">
-            <p>You may not use the platform to:</p>
-            <ul>
+            <p className="mb-6">You may not use the platform to:</p>
+            <ul className="space-y-4">
               <li>Violate any applicable laws or regulations.</li>
               <li>Harass, abuse, or harm another person.</li>
               <li>

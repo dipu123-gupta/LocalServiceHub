@@ -76,14 +76,16 @@ export const initSocket = (io) => {
         const ServiceProvider = (await import("../models/ServiceProvider.js"))
           .default;
 
-        const provider = await ServiceProvider.findByIdAndUpdate(
-          providerId,
-          { status },
-          { new: true },
-        );
-        if (provider) {
-          io.emit("providerStatusUpdated", { providerId, status });
+        // Auth check: only the provider's own user can update their status
+        const provider = await ServiceProvider.findById(providerId);
+        if (!provider || provider.user.toString() !== userId) {
+          console.warn(`Unauthorized status update attempt by socket user ${userId} for provider ${providerId}`);
+          return;
         }
+
+        provider.status = status;
+        await provider.save();
+        io.emit("providerStatusUpdated", { providerId, status });
       } catch (error) {
         console.error("Error updating provider status via socket:", error);
       }

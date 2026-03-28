@@ -7,6 +7,7 @@ import {
   verifyProviderStatus,
   getAllProviders,
   getProviderStats,
+  updateAvailabilitySlots,
 } from "../controllers/serviceProviderController.js";
 import { protect, admin } from "../middlewares/authMiddleware.js";
 import { upload } from "../config/cloudinary.js";
@@ -18,6 +19,7 @@ router.use(protect);
 // Provider only routes
 router.route("/profile").get(getProviderProfile).put(updateProviderProfile);
 router.route("/stats").get(getProviderStats);
+router.route("/availability-slots").put(updateAvailabilitySlots);
 router.route("/documents").post(upload.single("document"), uploadDocument);
 
 // Admin only routes

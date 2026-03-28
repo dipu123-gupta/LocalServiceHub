@@ -50,14 +50,14 @@ const CTABanner = () => {
           className="flex flex-col sm:flex-row justify-center items-center gap-6"
         >
           <Link to="/register" className="w-full sm:w-auto">
-            <button className="w-full sm:w-auto h-16 px-10 bg-indigo-600 hover:bg-indigo-500 text-white rounded-[2rem] font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-indigo-600/20">
+            <button className="w-full sm:w-auto h-14 md:h-16 px-10 bg-indigo-600 hover:bg-indigo-500 text-white rounded-[1.5rem] md:rounded-[2rem] font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-indigo-600/20">
               Become a Provider
               <ArrowRight size={18} />
             </button>
           </Link>
           <Link to="/services" className="w-full sm:w-auto">
-            <button className="w-full sm:w-auto h-16 px-10 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[2rem] font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 transition-all active:scale-95">
-              Explore Our Services
+            <button className="w-full sm:w-auto h-14 md:h-16 px-10 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[1.5rem] md:rounded-[2rem] font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 transition-all active:scale-95">
+              Explore Services
             </button>
           </Link>
         </motion.div>

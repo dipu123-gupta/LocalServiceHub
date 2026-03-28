@@ -97,11 +97,11 @@ const Safety = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         <div className="lg:col-span-2 space-y-10">
           {/* Identity Verification Status */}
-          <section className="bg-white rounded-[3.5rem] border border-slate-100 shadow-xl overflow-hidden relative group">
+          <section className="bg-white rounded-[2rem] md:rounded-[3.5rem] border border-slate-100 shadow-xl overflow-hidden relative group">
              <div className={`absolute top-0 right-0 w-3 w-full h-2 ${
                profile?.isVerified ? 'bg-emerald-500' : (profile?.documents?.length > 0 ? 'bg-amber-500' : 'bg-rose-500')
              }`} />
-             <div className="p-12 space-y-10">
+             <div className="p-6 md:p-12 space-y-10">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-[1.5rem] flex items-center justify-center shadow-inner">
@@ -121,7 +121,7 @@ const Safety = () => {
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="p-8 bg-slate-50/50 rounded-[2.5rem] border border-slate-50 flex items-center gap-6">
+                  <div className="p-6 md:p-8 bg-slate-50/50 rounded-[2rem] md:rounded-[2.5rem] border border-slate-50 flex items-center gap-6">
                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${profile?.isVerified ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400 shadow-inner'}`}>
                       <CheckCircle2 size={24} />
                     </div>
@@ -144,7 +144,7 @@ const Safety = () => {
           </section>
 
           {/* Document Upload Section */}
-          <section className="bg-slate-900 rounded-[3.5rem] p-12 text-white relative overflow-hidden shadow-2xl shadow-indigo-100">
+          <section className="bg-slate-900 rounded-[2rem] md:rounded-[3.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl shadow-indigo-100">
              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-500/10 blur-[100px] -mr-40 -mt-40" />
              <div className="relative z-10 space-y-8">
                 <div className="flex items-center gap-4">

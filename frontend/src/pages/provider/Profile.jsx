@@ -219,9 +219,9 @@ const Profile = () => {
     <div className="max-w-5xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-        <div className="flex items-center gap-8">
+        <div className="flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-8 text-center md:text-left">
           <div className="relative group">
-            <div className="w-32 h-32 rounded-[3rem] bg-slate-900 border-4 border-white shadow-2xl flex items-center justify-center text-white text-4xl font-black overflow-hidden ring-4 ring-slate-100 transition-transform duration-500 group-hover:scale-105">
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] md:rounded-[3rem] bg-slate-900 border-4 border-white shadow-2xl flex items-center justify-center text-white text-3xl md:text-4xl font-black overflow-hidden ring-4 ring-slate-100 transition-transform duration-500 group-hover:scale-105">
               {userInfo?.profileImage ? (
                 <img src={userInfo.profileImage} alt="" className="w-full h-full object-cover" />
               ) : (
@@ -252,10 +252,12 @@ const Profile = () => {
                 </div>
               )}
             </div>
-            <p className="text-slate-500 font-bold flex items-center gap-2">
-              <Mail size={14} className="text-slate-400" />
-              {userInfo?.email}
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-200 mx-2" />
+            <p className="text-slate-500 font-bold flex flex-col md:flex-row items-center gap-2">
+              <span className="flex items-center gap-2">
+                <Mail size={14} className="text-slate-400" />
+                {userInfo?.email}
+              </span>
+              <span className="hidden md:inline w-1.5 h-1.5 rounded-full bg-slate-200 mx-2" />
               <span className="uppercase text-[10px] tracking-widest text-indigo-600 font-black">Partner Since {new Date(profile?.createdAt).getFullYear()}</span>
             </p>
           </div>
@@ -263,7 +265,7 @@ const Profile = () => {
         <button 
           form="profileForm"
           disabled={saving}
-          className="px-10 py-5 bg-indigo-600 text-white rounded-3xl font-black shadow-2xl shadow-indigo-100 hover:bg-slate-900 transition-all flex items-center gap-3 group active:scale-95 disabled:opacity-50"
+          className="w-full md:w-auto px-10 py-5 bg-indigo-600 text-white rounded-[2rem] md:rounded-3xl font-black shadow-2xl shadow-indigo-100 hover:bg-slate-900 transition-all flex items-center justify-center gap-3 group active:scale-95 disabled:opacity-50"
         >
           {saving ? <Loader2 size={24} className="animate-spin" /> : <Save size={24} />}
           {saving ? "SAVING..." : "SAVE CHANGES"}
@@ -273,7 +275,7 @@ const Profile = () => {
       <form id="profileForm" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         <div className="lg:col-span-2 space-y-10">
           {/* Business Details */}
-          <section className="bg-white rounded-[3rem] border border-slate-100 shadow-xl p-10 space-y-8">
+          <section className="bg-white rounded-[2rem] md:rounded-[3rem] border border-slate-100 shadow-xl p-6 md:p-10 space-y-8">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
                 <Building size={20} />
@@ -366,7 +368,7 @@ const Profile = () => {
           </section>
 
           {/* Bank Details */}
-          <section className="bg-white rounded-[3rem] border border-slate-100 shadow-xl p-10 space-y-8">
+          <section className="bg-white rounded-[2rem] md:rounded-[3rem] border border-slate-100 shadow-xl p-6 md:p-10 space-y-8">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center">
                 <CreditCard size={20} />
@@ -415,7 +417,7 @@ const Profile = () => {
           </section>
 
           {/* Contact Details */}
-          <section className="bg-white rounded-[3rem] border border-slate-100 shadow-xl p-10 space-y-8">
+          <section className="bg-white rounded-[2rem] md:rounded-[3rem] border border-slate-100 shadow-xl p-6 md:p-10 space-y-8">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
                 <User size={20} />
@@ -449,7 +451,7 @@ const Profile = () => {
           </section>
 
           {/* Password Section */}
-          <section className="bg-white rounded-[3rem] border border-slate-100 shadow-xl p-10 space-y-8">
+          <section className="bg-white rounded-[2rem] md:rounded-[3rem] border border-slate-100 shadow-xl p-6 md:p-10 space-y-8">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
                 <ShieldCheck size={20} />
@@ -493,7 +495,7 @@ const Profile = () => {
 
         {/* Sidebar info */}
         <div className="space-y-8">
-          <div className="bg-slate-900 rounded-[3rem] p-8 text-white relative overflow-hidden group">
+          <div className="bg-slate-900 rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 text-white relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-[50px] -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
             <h4 className="text-lg font-black tracking-tight mb-6">Verification Status</h4>
             <div className="space-y-6">
@@ -512,11 +514,11 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-[3rem] border border-slate-100 shadow-xl p-8 space-y-6">
+          <div className="bg-white rounded-[2rem] md:rounded-[3rem] border border-slate-100 shadow-xl p-6 md:p-8 space-y-6">
             <h4 className="text-lg font-black text-slate-900 tracking-tight">Verification Documents</h4>
             <div className="space-y-4">
               {profile?.documents?.map((doc, idx) => (
-                <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <div key={idx} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 gap-3">
                   <div className="flex items-center gap-3">
                     <FileUp size={16} className="text-indigo-400" />
                     <div>
@@ -526,30 +528,31 @@ const Profile = () => {
                       </p>
                     </div>
                   </div>
-                  <a href={doc.url} target="_blank" rel="noreferrer" className="p-2 bg-white rounded-lg shadow-sm hover:text-indigo-600 transition-colors">
-                    <Globe size={12} />
+                  <a href={doc.url} target="_blank" rel="noreferrer" className="w-full sm:w-auto p-2 bg-white rounded-lg shadow-sm hover:text-indigo-600 transition-colors flex items-center justify-center">
+                    <Globe size={12} className="mr-2 sm:mr-0" />
+                    <span className="sm:hidden text-[10px] font-black uppercase">View Document</span>
                   </a>
                 </div>
               ))}
               
               <label className={`flex flex-col items-center justify-center p-6 border-2 border-dashed border-indigo-100 rounded-[2rem] bg-indigo-50/30 hover:bg-indigo-50 transition-all cursor-pointer ${uploadingDoc ? 'opacity-50 pointer-events-none' : ''}`}>
                 <FileUp className={`mb-2 ${uploadingDoc ? 'animate-bounce text-indigo-400' : 'text-indigo-200'}`} size={24} />
-                <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{uploadingDoc ? 'Uploading...' : 'Upload Document'}</span>
+                <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest text-center">{uploadingDoc ? 'Uploading...' : 'Upload Document'}</span>
                 <input type="file" onChange={handleDocumentUpload} className="hidden" />
               </label>
             </div>
           </div>
 
-          <div className="bg-white rounded-[3rem] border border-slate-100 shadow-xl p-8 space-y-6">
+          <div className="bg-white rounded-[2rem] md:rounded-[3rem] border border-slate-100 shadow-xl p-6 md:p-8 space-y-6">
             <h4 className="text-lg font-black text-slate-900 tracking-tight">Support Policy</h4>
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="text-indigo-400 shrink-0 mt-0.5" size={16} />
-                <p className="text-xs font-bold text-slate-500 leading-relaxed">System updates to Business Name or Contact will take up to 24h to reflect across all listings.</p>
+              <div className="flex items-start gap-4">
+                <AlertCircle className="text-indigo-400 shrink-0 mt-0.5" size={18} />
+                <p className="text-xs font-bold text-slate-500 leading-relaxed md:leading-normal transition-colors">System updates to Business Name or Contact will take up to 24h to reflect across all listings.</p>
               </div>
-              <div className="flex items-start gap-3">
-                <Globe className="text-slate-300 shrink-0 mt-0.5" size={16} />
-                <p className="text-xs font-bold text-slate-500 leading-relaxed">Your operating area helps our search engine match you with local customers.</p>
+              <div className="flex items-start gap-4">
+                <Globe className="text-slate-300 shrink-0 mt-0.5" size={18} />
+                <p className="text-xs font-bold text-slate-500 leading-relaxed md:leading-normal transition-colors">Your operating area helps our search engine match you with local customers.</p>
               </div>
             </div>
           </div>

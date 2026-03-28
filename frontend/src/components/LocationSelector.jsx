@@ -116,15 +116,15 @@ const LocationSelector = () => {
     <div className="relative z-[1000]" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 bg-white border border-slate-100 px-5 py-3 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-100 transition-all group active:scale-95"
+        className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 px-5 py-3 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-100 dark:hover:border-indigo-900 transition-all group active:scale-95"
       >
         <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors">
           <MapPin size={16} />
         </div>
         <div className="text-left">
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Your location</p>
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 leading-none mb-1">Your location</p>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-black text-slate-900">{selectedCity}</span>
+            <span className="text-sm font-black text-slate-900 dark:text-white">{selectedCity}</span>
             <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
           </div>
         </div>
@@ -136,17 +136,17 @@ const LocationSelector = () => {
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute top-full left-0 mt-4 w-72 bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden"
+            className="absolute top-full left-0 mt-4 w-72 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden"
           >
-            <div className="p-6 border-b border-slate-50">
+            <div className="p-6 border-b border-slate-50 dark:border-slate-800">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Location Settings</h4>
-                <Globe size={14} className="text-indigo-200" />
+                <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Location Settings</h4>
+                <Globe size={14} className="text-indigo-200 dark:text-indigo-900/50" />
               </div>
               <button
                 onClick={detectLocation}
                 disabled={detecting}
-                className="w-full flex items-center justify-center gap-3 bg-slate-900 text-white px-6 py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-indigo-600 transition-all active:scale-95 disabled:opacity-50 group"
+                className="w-full flex items-center justify-center gap-3 bg-slate-900 dark:bg-indigo-600 text-white px-6 py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-indigo-600 dark:hover:bg-indigo-500 transition-all active:scale-95 disabled:opacity-50 group shadow-lg shadow-indigo-600/20"
               >
                 {detecting ? (
                   <Loader2 size={16} className="animate-spin" />
@@ -175,8 +175,8 @@ const LocationSelector = () => {
                       onClick={() => handleCitySelect(city.name)}
                       className={`w-full text-left px-4 py-3.5 rounded-xl text-sm font-bold flex items-center justify-between transition-all ${
                         selectedCity === city.name 
-                          ? "bg-indigo-50 text-indigo-600 shadow-inner" 
-                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                          ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 shadow-inner" 
+                          : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
                       }`}
                     >
                       {city.name}
@@ -189,11 +189,11 @@ const LocationSelector = () => {
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center">
-                <Search size={14} className="text-slate-400" />
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                <Search size={14} className="text-slate-400 dark:text-slate-500" />
               </div>
-              <p className="text-[10px] font-bold text-slate-400 leading-tight">Can't find your city? We're expanding fast!</p>
+              <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 leading-tight">Can't find your city? We're expanding fast!</p>
             </div>
           </motion.div>
         )}

@@ -32,8 +32,8 @@ const createAnnouncement = asyncHandler(async (req, res) => {
 
     // 2. Broadcast via Push (FCM) & Save to DB Notifications
     const query = {};
-    if (targetRole !== "everyone" && targetRole !== "all") {
-      query.role = targetRole === "users" ? "user" : "provider";
+    if (targetRole !== "all") {
+      query.role = targetRole; // "user" or "provider" — matches enum
     }
 
     const users = await User.find(query).select("_id");

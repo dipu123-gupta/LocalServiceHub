@@ -82,10 +82,47 @@ const bookingSchema = new mongoose.Schema(
       ],
       default: "pending",
     },
+    otp: {
+      type: String,
+    },
+    arrivalPhoto: {
+      url: String,
+      public_id: String,
+    },
+    completionPhoto: {
+      url: String,
+      public_id: String,
+    },
+    additionalCharges: [
+      {
+        item: String,
+        price: Number,
+        approvalStatus: {
+          type: String,
+          enum: ["pending", "approved", "rejected"],
+          default: "pending",
+        },
+      },
+    ],
+    taxPercentage: {
+      type: Number,
+      default: 18,
+    },
+    invoiceId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
     notes: {
       type: String,
     },
     paymentIntentId: {
+      type: String,
+    },
+    razorpayOrderId: {
+      type: String,
+    },
+    razorpayPaymentId: {
       type: String,
     },
   },

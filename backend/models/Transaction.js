@@ -25,6 +25,18 @@ const transactionSchema = new mongoose.Schema(
       enum: ["cash", "points"],
       default: "cash",
     },
+    subtotal: {
+      type: Number,
+      default: 0,
+    },
+    taxAmount: {
+      type: Number,
+      default: 0,
+    },
+    commissionAmount: {
+      type: Number,
+      default: 0,
+    },
     description: {
       type: String,
       required: true,
@@ -47,6 +59,8 @@ const transactionSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+transactionSchema.index({ user: 1, createdAt: -1 });
 
 const Transaction = mongoose.model("Transaction", transactionSchema);
 export default Transaction;

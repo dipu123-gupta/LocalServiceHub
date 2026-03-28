@@ -11,6 +11,7 @@ import { createNotification } from "./notificationController.js";
 import Setting from "../models/Setting.js";
 import PaymentTransaction from "../models/PaymentTransaction.js";
 import { getSurgeMultiplier } from "../utils/surgeUtils.js";
+import sendEmail from "../utils/sendEmail.js";
 
 // @desc    Create new booking
 // @route   POST /api/bookings
@@ -69,6 +70,8 @@ const createBooking = asyncHandler(async (req, res) => {
   let finalAmount = basePrice;
 
   // 1. Handle Coupon Validation (Security Re-check)
+  // Note: Coupon usedCount increment is moved inside the transaction below to prevent race conditions
+  let validatedCoupon = null;
   if (couponCode) {
     const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
     if (
@@ -86,8 +89,7 @@ const createBooking = asyncHandler(async (req, res) => {
         discount = coupon.discountValue;
       }
       finalAmount = Math.max(0, basePrice - discount);
-      coupon.usedCount += 1;
-      await coupon.save();
+      validatedCoupon = coupon; // Save reference for atomic increment inside transaction
     }
   }
 
@@ -106,6 +108,14 @@ const createBooking = asyncHandler(async (req, res) => {
     }
   }
 
+  // 1.5 Check Provider Availability BEFORE starting transaction
+  const bDate = new Date(bookingDate);
+  const dayName = bDate.toLocaleDateString('en-US', { weekday: 'long' });
+  if (provider.availability?.days?.length > 0 && !provider.availability.days.includes(dayName)) {
+    res.status(400);
+    throw new Error(`Provider is not available on ${dayName}s`);
+  }
+
   // 2. Handle Wallet Payment & Booking Creation (Atomic)
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -113,6 +123,12 @@ const createBooking = asyncHandler(async (req, res) => {
   let booking; // Declare booking outside try block to be accessible later
 
   try {
+    // Atomically increment coupon usage inside the transaction to prevent race conditions
+    if (validatedCoupon) {
+      validatedCoupon.usedCount += 1;
+      await validatedCoupon.save({ session });
+    }
+
     if (paymentMethod === "wallet") {
       const wallet = await Wallet.findOne({ user: req.user._id }).session(session);
       if (!wallet || wallet.balance < finalAmount) {
@@ -120,7 +136,7 @@ const createBooking = asyncHandler(async (req, res) => {
       }
 
       wallet.balance -= finalAmount;
-      wallet.loyaltyPoints += Math.floor(finalAmount / 100);
+      // Loyalty points are awarded on booking completion, not here (prevent double-award)
       await wallet.save({ session });
 
       await Transaction.create(
@@ -135,13 +151,6 @@ const createBooking = asyncHandler(async (req, res) => {
         ],
         { session },
       );
-    }
-
-    // 0.5 Check Provider Availability (Basic day-based check)
-    const bDate = new Date(bookingDate);
-    const dayName = bDate.toLocaleDateString('en-US', { weekday: 'long' });
-    if (provider.availability?.days?.length > 0 && !provider.availability.days.includes(dayName)) {
-      throw new Error(`Provider is not available on ${dayName}s`);
     }
 
     const commissionAmount = (finalAmount * commissionRateValue) / 100;
@@ -163,6 +172,7 @@ const createBooking = asyncHandler(async (req, res) => {
       notes,
       status: "pending",
       paymentStatus: paymentMethod === "wallet" ? "completed" : "pending",
+      otp: Math.floor(1000 + Math.random() * 9000).toString(), // Generate 4-digit OTP
     };
 
     const [createdBooking] = await Booking.create([bookingData], { session });
@@ -217,8 +227,10 @@ const createBooking = asyncHandler(async (req, res) => {
 
     res.status(201).json(populatedBooking);
   } catch (error) {
-    if (session.inAtomicity) {
+    try {
       await session.abortTransaction();
+    } catch (_) {
+      // Transaction may have already been committed/aborted
     }
     session.endSession();
     res.status(400);
@@ -314,7 +326,19 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
     throw new Error("Not authorized to update this booking");
   }
 
-  booking.status = status || booking.status;
+    if (status === "completed") {
+      if (!req.body.otp || req.body.otp !== booking.otp) {
+        res.status(400);
+        throw new Error("Invalid completion OTP. Please ask the customer for the correct code.");
+      }
+    }
+
+    const oldStatus = booking.status;
+    booking.status = status || booking.status;
+
+    // Handle Photos if provided
+    if (req.body.arrivalPhoto) booking.arrivalPhoto = req.body.arrivalPhoto;
+    if (req.body.completionPhoto) booking.completionPhoto = req.body.completionPhoto;
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -322,7 +346,18 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
   try {
     const updatedBooking = await booking.save({ session });
 
-    if (status === "completed" && booking.status !== "completed") {
+    if (status === "completed" && oldStatus !== "completed") {
+      // Generate Invoice ID if not exists
+      if (!booking.invoiceId) {
+        booking.invoiceId = `INV-${Date.now()}-${booking._id.toString().slice(-4).toUpperCase()}`;
+      }
+
+      // Calculate granular financial breakdown for the transaction
+      // For this app, subtotal is totalAmount - tax, where tax is 18% inclusive
+      const taxRate = booking.taxPercentage || 18;
+      const subtotal = booking.totalAmount / (1 + taxRate / 100);
+      const taxAmount = booking.totalAmount - subtotal;
+
       const userWallet = await Wallet.findOne({ user: booking.user._id }).session(session);
       if (userWallet) {
         const pointsToAdd = Math.floor(booking.totalAmount / 100);
@@ -339,6 +374,8 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
               category: "points",
               description: `Points earned for completing ${booking.service.title}`,
               booking: booking._id,
+              subtotal,
+              taxAmount,
             },
           ],
           { session },
@@ -350,9 +387,10 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
         const providerWallet = await Wallet.findOne({ user: providerProfile.user }).session(session);
         if (providerWallet) {
           if (booking.paymentMethod === "Cash on Delivery") {
-            // Provider has full cash, platform takes commission as a "debt" or debit from balance
-            providerWallet.balance -= booking.commissionAmount;
-            // totalEarnings still increases because they earned the full amount minus commission
+            // Provider collected full cash from the user.
+            // Commission is owed to the platform — we track it but do NOT
+            // deduct from balance (which can't go below 0). Commission
+            // reconciliation happens via the pending settlement flow.
             providerWallet.totalEarnings += booking.providerEarnings;
             await providerWallet.save({ session });
 
@@ -362,9 +400,12 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
                   user: providerProfile.user,
                   amount: booking.commissionAmount,
                   type: "debit",
-                  description: `Commission for COD booking: ${booking.service.title}`,
-                  status: "completed",
+                  description: `Commission owed to platform for COD booking: ${booking.service.title}`,
+                  status: "pending", // Pending until provider pays/settles
                   booking: booking._id,
+                  subtotal,
+                  taxAmount,
+                  commissionAmount: booking.commissionAmount
                 },
               ],
               { session },
@@ -385,6 +426,9 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
                   description: `Earnings for service completion: ${booking.service.title} (Digital Payment)`,
                   status: "completed",
                   booking: booking._id,
+                  subtotal,
+                  taxAmount,
+                  commissionAmount: booking.commissionAmount
                 },
               ],
               { session },
@@ -404,12 +448,121 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
+    // Send OTP email when booking is accepted
+    if (status === "accepted") {
+      try {
+        const userDoc = await User.findById(booking.user._id).select("name email");
+        const serviceName = booking.service?.title || "your booked service";
+        const bookingDate = new Date(booking.bookingDate).toLocaleDateString("en-IN", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+
+        const otpEmailHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Booking OTP</title>
+  <style>
+    body { margin: 0; padding: 0; background: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .wrapper { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+    .header { background: linear-gradient(135deg, #4f46e5, #6366f1); padding: 48px 40px; text-align: center; }
+    .header h1 { color: #ffffff; font-size: 28px; font-weight: 900; margin: 0; letter-spacing: -0.5px; }
+    .header p { color: rgba(255,255,255,0.8); margin: 8px 0 0; font-size: 15px; }
+    .body { padding: 40px; }
+    .greeting { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+    .subtext { font-size: 14px; color: #64748b; margin-bottom: 32px; line-height: 1.6; }
+    .otp-box { background: linear-gradient(135deg, #eef2ff, #e0e7ff); border: 2px solid #c7d2fe; border-radius: 20px; padding: 32px; text-align: center; margin: 24px 0; }
+    .otp-label { font-size: 11px; font-weight: 900; color: #6366f1; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+    .otp-code { font-size: 52px; font-weight: 900; color: #312e81; letter-spacing: 14px; margin: 0; }
+    .otp-hint { font-size: 12px; color: #818cf8; margin-top: 12px; }
+    .details-box { background: #f8fafc; border-radius: 16px; padding: 24px; margin: 24px 0; }
+    .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+    .detail-value { font-size: 13px; font-weight: 800; color: #1e293b; }
+    .warning { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 12px; padding: 16px 20px; font-size: 13px; color: #92400e; margin-top: 16px; }
+    .footer { background: #f8fafc; padding: 24px 40px; text-align: center; font-size: 12px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <h1>🏠 HomeServiceHub</h1>
+      <p>Your booking has been confirmed!</p>
+    </div>
+    <div class="body">
+      <p class="greeting">Hello, ${userDoc?.name || "Valued Customer"}! 👋</p>
+      <p class="subtext">
+        Great news! Your service provider has <strong>accepted your booking</strong>.
+        Please share the OTP below with the provider only after they have completed the work
+        to your satisfaction. Do not share it before the job is done.
+      </p>
+
+      <div class="otp-box">
+        <p class="otp-label">🔐 Your Completion OTP</p>
+        <p class="otp-code">${booking.otp}</p>
+        <p class="otp-hint">Share this with the provider only after work is complete</p>
+      </div>
+
+      <div class="details-box">
+        <div class="detail-row">
+          <span class="detail-label">Service</span>
+          <span class="detail-value">${serviceName}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Booking Date</span>
+          <span class="detail-value">${bookingDate}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Time Slot</span>
+          <span class="detail-value">${booking.timeSlot}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Booking ID</span>
+          <span class="detail-value">#${booking._id.toString().slice(-8).toUpperCase()}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Amount</span>
+          <span class="detail-value">₹${booking.totalAmount}</span>
+        </div>
+      </div>
+
+      <div class="warning">
+        ⚠️ <strong>Important:</strong> Only share this OTP with the service provider after you are fully satisfied with the completed work. This OTP cannot be regenerated.
+      </div>
+    </div>
+    <div class="footer">
+      <p>You're receiving this because you booked a service on HomeServiceHub.</p>
+      <p>© ${new Date().getFullYear()} HomeServiceHub. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+        await sendEmail({
+          email: userDoc.email,
+          subject: `🔐 Your Booking OTP for ${serviceName} — HomeServiceHub`,
+          message: `Your booking for "${serviceName}" has been accepted. Your OTP is: ${booking.otp}. Share this with the provider only after work is complete.`,
+          html: otpEmailHtml,
+        });
+
+        console.log(`OTP email sent to ${userDoc.email} for booking ${booking._id}`);
+      } catch (emailErr) {
+        // Non-blocking: log the error but don't fail the request
+        console.error("Failed to send OTP email:", emailErr.message);
+      }
+    }
+
     // Emit notification after successful status update
     const io = req.app.get("io");
     if (io && booking.user) {
       const statusMessages = {
         accepted:
-          "Your booking has been accepted! The professional will be at your location on time.",
+          "Your booking has been accepted! Check your email for the completion OTP.",
         "on-the-way": "Good news! The professional is on the way to your location.",
         started: "The service has started. The professional is now working on your request.",
         completed: "Your service has been completed. Please leave a review!",
@@ -438,36 +591,52 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
 // @route   GET /api/bookings/admin/stats
 // @access  Private/Admin
 const getAdminStats = asyncHandler(async (req, res) => {
-  let financials = await PaymentTransaction.aggregate([
+  const financials = await Booking.aggregate([
+    { $match: { status: "completed" } },
     {
       $group: {
         _id: null,
         totalRevenue: { $sum: "$totalAmount" },
-        totalCommission: { $sum: "$platformCommission" },
+        totalCommission: { $sum: "$commissionAmount" },
+        providerEarnings: { $sum: "$providerEarnings" },
         totalBookings: { $count: {} },
       },
     },
   ]);
 
-  // Fallback: If no payment transactions yet (legacy data), calculate from completed bookings
-  if (!financials || financials.length === 0) {
-    const bookingFinancials = await Booking.aggregate([
-      { $match: { status: "completed" } },
-      {
-        $group: {
-          _id: null,
-          totalRevenue: { $sum: "$totalAmount" },
-          totalCommission: { $sum: "$commissionAmount" },
-          totalBookings: { $count: {} },
-        },
-      },
-    ]);
-    if (bookingFinancials && bookingFinancials.length > 0) {
-      financials = bookingFinancials;
-    } else {
-      financials = [{ totalRevenue: 0, totalCommission: 0, totalBookings: 0 }];
-    }
-  }
+  const stats = financials[0] || {
+    totalRevenue: 0,
+    totalCommission: 0,
+    providerEarnings: 0,
+    totalBookings: 0,
+  };
+
+  // Calculate real growth metrics by comparing current vs previous month
+  const now = new Date();
+  const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  const [thisMonthData] = await Booking.aggregate([
+    { $match: { status: "completed", createdAt: { $gte: startOfThisMonth } } },
+    { $group: { _id: null, revenue: { $sum: "$totalAmount" }, commission: { $sum: "$commissionAmount" } } },
+  ]) || [{ revenue: 0, commission: 0 }];
+
+  const [lastMonthData] = await Booking.aggregate([
+    { $match: { status: "completed", createdAt: { $gte: startOfLastMonth, $lt: startOfThisMonth } } },
+    { $group: { _id: null, revenue: { $sum: "$totalAmount" }, commission: { $sum: "$commissionAmount" } } },
+  ]) || [{ revenue: 0, commission: 0 }];
+
+  const thisRevenue = thisMonthData?.revenue || 0;
+  const lastRevenue = lastMonthData?.revenue || 0;
+  const thisCommission = thisMonthData?.commission || 0;
+  const lastCommission = lastMonthData?.commission || 0;
+
+  stats.revenueGrowth = lastRevenue > 0
+    ? parseFloat((((thisRevenue - lastRevenue) / lastRevenue) * 100).toFixed(1))
+    : 0;
+  stats.commissionGrowth = lastCommission > 0
+    ? parseFloat((((thisCommission - lastCommission) / lastCommission) * 100).toFixed(1))
+    : 0;
 
   const statusBreakdown = await Booking.aggregate([
     {
@@ -511,22 +680,7 @@ const getAdminStats = asyncHandler(async (req, res) => {
     { $project: { title: "$serviceInfo.title", count: 1 } },
   ]);
 
-  // City Demand
-  const cityDemand = await Booking.aggregate([
-    {
-      $lookup: {
-        from: "serviceproviders",
-        localField: "provider",
-        foreignField: "_id",
-        as: "providerInfo",
-      },
-    },
-    { $unwind: "$providerInfo" },
-    { $unwind: "$providerInfo.location" }, // this might depend on schema, let's assume cities are strings as per Service model
-    // Actually, services have cities. Let's group by service city if available.
-    // However, booking has a 'service' populated.
-  ]);
-  // Re-evaluating City Demand: Since user has address in booking, let's use that.
+  // City-wise Demand
   const cityWiseDemand = await Booking.aggregate([
     { $group: { _id: "$address.city", count: { $sum: 1 } } },
     { $sort: { count: -1 } },
@@ -534,11 +688,7 @@ const getAdminStats = asyncHandler(async (req, res) => {
   ]);
 
   res.json({
-    financials: financials[0] || {
-      totalRevenue: 0,
-      totalCommission: 0,
-      totalBookings: 0,
-    },
+    financials: stats,
     statusBreakdown,
     dailyBookings,
     topServices,
@@ -569,6 +719,9 @@ const cancelBooking = asyncHandler(async (req, res) => {
     throw new Error("Booking not found");
   }
 
+  // Fetch provider profile for notifications
+  const providerProfile = await ServiceProvider.findById(booking.provider);
+
   // Check if the user is the owner OR admin
   if (
     booking.user.toString() !== req.user._id.toString() &&
@@ -590,9 +743,9 @@ const cancelBooking = asyncHandler(async (req, res) => {
   try {
     booking.status = "cancelled";
     
-    // Refund if paid via wallet
+    // Refund if paid via wallet — always refund to the booking owner, not req.user (could be admin)
     if (booking.paymentMethod === "wallet" && booking.paymentStatus === "completed") {
-      const wallet = await Wallet.findOne({ user: req.user._id }).session(session);
+      const wallet = await Wallet.findOne({ user: booking.user }).session(session);
       if (wallet) {
         wallet.balance += booking.totalAmount;
         await wallet.save({ session });
@@ -685,6 +838,114 @@ const getPaymentTransactions = asyncHandler(async (req, res) => {
   res.status(200).json(transactions);
 });
 
+// @desc    Add additional charge to booking (Provider)
+// @route   POST /api/bookings/:id/additional-charge
+// @access  Private/Provider
+const addAdditionalCharge = asyncHandler(async (req, res) => {
+  const { item, price } = req.body;
+
+  if (!item || !price) {
+    res.status(400);
+    throw new Error("Please provide item name and price");
+  }
+
+  const booking = await Booking.findById(req.params.id);
+
+  if (!booking) {
+    res.status(404);
+    throw new Error("Booking not found");
+  }
+
+  const providerProfile = await ServiceProvider.findOne({ user: req.user._id });
+  if (!providerProfile || booking.provider.toString() !== providerProfile._id.toString()) {
+    res.status(401);
+    throw new Error("Not authorized to add charges to this booking");
+  }
+
+  if (booking.status !== "started") {
+    res.status(400);
+    throw new Error("Extra charges can only be added while the job is in progress (started status).");
+  }
+
+  booking.additionalCharges.push({ item, price, approvalStatus: "pending" });
+  
+  // NOTE: In a full production app, we would notify the customer to approve this.
+  // For this version, we'll auto-approve or add it to the pending list.
+  // We'll update totalAmount so the provider sees it in earnings calculation later.
+  
+  await booking.save();
+
+  res.status(200).json(booking);
+});
+
+// @desc    Approve or reject additional charge (Customer)
+// @route   PUT /api/bookings/:id/approve-charge/:chargeId
+// @access  Private
+const approveAdditionalCharge = asyncHandler(async (req, res) => {
+  const { status } = req.body; // 'approved' or 'rejected'
+
+  if (!["approved", "rejected"].includes(status)) {
+    res.status(400);
+    throw new Error("Invalid status. Must be 'approved' or 'rejected'");
+  }
+
+  const booking = await Booking.findById(req.params.id)
+    .populate("service", "title")
+    .populate("provider", "user");
+
+  if (!booking) {
+    res.status(404);
+    throw new Error("Booking not found");
+  }
+
+  if (booking.user.toString() !== req.user._id.toString()) {
+    res.status(401);
+    throw new Error("Not authorized to approve charges for this booking");
+  }
+
+  const charge = booking.additionalCharges.id(req.params.chargeId);
+  if (!charge) {
+    res.status(404);
+    throw new Error("Additional charge not found");
+  }
+
+  if (charge.approvalStatus !== "pending") {
+    res.status(400);
+    throw new Error("Charge is already processed");
+  }
+
+  charge.approvalStatus = status;
+
+  // If approved, update the total amount and commission/earnings
+  if (status === "approved") {
+    // Calculate original commission rate from booking data with division-by-zero guard
+    const originalRate = booking.totalAmount > 0
+      ? (booking.commissionAmount / booking.totalAmount) * 100
+      : 15; // Fallback to default 15% if totalAmount is 0
+    
+    booking.totalAmount += charge.price;
+    const extraCommission = (charge.price * originalRate) / 100;
+    booking.commissionAmount += extraCommission;
+    booking.providerEarnings += (charge.price - extraCommission);
+  }
+
+  await booking.save();
+
+  // Notify Provider
+  const io = req.app.get("io");
+  if (io && booking.provider && booking.provider.user) {
+    await createNotification(io, {
+      recipient: booking.provider.user,
+      title: `Extra Charge ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+      message: `The customer has ${status} the extra charge of ₹${charge.price} for "${charge.item}".`,
+      type: "booking_update",
+      link: "/provider/bookings",
+    });
+  }
+
+  res.status(200).json(booking);
+});
+
 export {
   createBooking,
   getMyBookings,
@@ -695,4 +956,6 @@ export {
   getAllBookings,
   cancelBooking,
   getPaymentTransactions,
+  addAdditionalCharge,
+  approveAdditionalCharge,
 };

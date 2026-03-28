@@ -27,7 +27,10 @@ const addFunds = asyncHandler(async (req, res) => {
     throw new Error("Invalid amount");
   }
 
-  const wallet = await Wallet.findOne({ user: req.user._id });
+  let wallet = await Wallet.findOne({ user: req.user._id });
+  if (!wallet) {
+    wallet = await Wallet.create({ user: req.user._id });
+  }
   wallet.balance += Number(amount);
   await wallet.save();
 

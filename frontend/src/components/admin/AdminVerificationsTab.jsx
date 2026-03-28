@@ -16,13 +16,13 @@ const AdminVerificationsTab = ({ pendingProviders = [], setPendingProviders }) =
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="p-8 border-b border-slate-100 flex items-center justify-between">
+    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 transition-colors">
+      <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between transition-colors">
         <div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             Verification Requests
           </h2>
-          <p className="text-slate-500 text-sm font-medium mt-1">
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">
             {pendingProviders.length} providers waiting for manual review.
           </p>
         </div>
@@ -30,10 +30,10 @@ const AdminVerificationsTab = ({ pendingProviders = [], setPendingProviders }) =
 
       {pendingProviders.length === 0 ? (
         <div className="text-center py-20 px-6">
-          <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
-            <CheckCircle className="text-slate-300" size={32} />
+          <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100 dark:border-slate-700 transition-colors">
+            <CheckCircle className="text-slate-300 dark:text-slate-600" size={32} />
           </div>
-          <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">
+          <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">
             Inbox Zero: No pending verifications
           </p>
         </div>
@@ -41,12 +41,12 @@ const AdminVerificationsTab = ({ pendingProviders = [], setPendingProviders }) =
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-slate-50/50">
+              <tr className="bg-slate-50/50 dark:bg-slate-800/50 transition-colors">
                 {["Provider Entity", "Business Name", "Skills & Services", "Financial Details", "Documentation", "Decision"].map(
                   (h) => (
                     <th
                       key={h}
-                      className="px-8 py-5 text-[0.65rem] font-black text-slate-400 uppercase tracking-[0.2em]"
+                      className="px-8 py-5 text-[0.65rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]"
                     >
                       {h}
                     </th>
@@ -54,39 +54,39 @@ const AdminVerificationsTab = ({ pendingProviders = [], setPendingProviders }) =
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
               {pendingProviders.map((p) => (
-                <tr key={p._id} className="group hover:bg-slate-50/50 transition-colors">
+                <tr key={p._id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="px-8 py-6">
-                    <div className="font-black text-slate-900 leading-tight">
+                    <div className="font-black text-slate-900 dark:text-white leading-tight">
                       {p.user?.name}
                     </div>
-                    <div className="text-xs font-bold text-slate-400 mt-0.5 uppercase tracking-wider">
+                    <div className="text-xs font-bold text-slate-400 dark:text-slate-500 mt-0.5 uppercase tracking-wider">
                       {p.user?.email}
                     </div>
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center border border-indigo-100 dark:border-indigo-900/50 transition-colors">
                         🏢
                       </div>
-                      <span className="font-bold text-slate-700">{p.businessName}</span>
+                      <span className="font-bold text-slate-700 dark:text-slate-200">{p.businessName}</span>
                     </div>
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex flex-wrap gap-1.5 max-w-[200px]">
                       {p.skills?.length > 0 ? p.skills.map((s, idx) => (
-                        <span key={idx} className="px-2 py-1 bg-white border border-slate-100 rounded-md text-[9px] font-black text-slate-500 uppercase tracking-tighter">
+                        <span key={idx} className="px-2 py-1 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-md text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-tighter">
                           {s}
                         </span>
-                      )) : <span className="text-[10px] text-slate-300 italic">No skills listed</span>}
+                      )) : <span className="text-[10px] text-slate-300 dark:text-slate-600 italic">No skills listed</span>}
                     </div>
                   </td>
                   <td className="px-8 py-6">
                     <div className="space-y-1">
-                      <div className="text-[10px] font-black text-slate-900 leading-none">{p.bankDetails?.bankName || 'N/A'}</div>
-                      <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{p.bankDetails?.accountNumber || 'Account N/A'}</div>
-                      <div className="text-[8px] font-black text-indigo-500">{p.bankDetails?.ifscCode || 'IFSC N/A'}</div>
+                      <div className="text-[10px] font-black text-slate-900 dark:text-white leading-none">{p.bankDetails?.bankName || 'N/A'}</div>
+                      <div className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{p.bankDetails?.accountNumber || 'Account N/A'}</div>
+                      <div className="text-[8px] font-black text-indigo-500 dark:text-indigo-400">{p.bankDetails?.ifscCode || 'IFSC N/A'}</div>
                     </div>
                   </td>
                   <td className="px-8 py-6">
@@ -97,7 +97,7 @@ const AdminVerificationsTab = ({ pendingProviders = [], setPendingProviders }) =
                           href={doc.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex items-center gap-2 text-xs font-black text-indigo-600 hover:text-indigo-800 transition-colors group/link"
+                          className="flex items-center gap-2 text-xs font-black text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors group/link"
                         >
                           <FileText size={14} className="group-hover/link:animate-bounce" />
                           <span className="underline underline-offset-4">{doc.name}</span>

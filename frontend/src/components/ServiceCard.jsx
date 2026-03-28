@@ -62,10 +62,10 @@ const ServiceCard = ({ service }) => {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="group bg-white rounded-3xl overflow-hidden border border-slate-100 flex flex-col shadow-sm hover:shadow-2xl hover:shadow-indigo-100 transition-all duration-500 hover:-translate-y-2 h-full"
+      className="group bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-700 flex flex-col shadow-sm hover:shadow-2xl hover:shadow-indigo-100 dark:hover:shadow-indigo-900/40 transition-all duration-500 hover:-translate-y-2 h-full"
     >
       {/* Image Container */}
-      <div className="relative h-56 bg-gradient-to-br from-indigo-50 to-purple-50 overflow-hidden">
+      <div className="relative h-56 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-800 dark:to-slate-900 overflow-hidden">
         {service.images?.length > 0 ? (
           <img
             src={
@@ -85,7 +85,7 @@ const ServiceCard = ({ service }) => {
         {/* Favorite Heart */}
         <button
           onClick={toggleFavorite}
-          className="absolute top-4 left-4 p-2.5 rounded-2xl bg-white/90 backdrop-blur-md shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 z-10 group/heart"
+          className="absolute top-4 left-4 p-2.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 z-10 group/heart"
         >
           <Heart
             size={18}
@@ -98,9 +98,9 @@ const ServiceCard = ({ service }) => {
         </button>
 
         {/* Rating Badge */}
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-2xl flex items-center gap-1.5 shadow-lg border border-white/50">
+        <div className="absolute top-4 right-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md px-3 py-1.5 rounded-2xl flex items-center gap-1.5 shadow-lg border border-white/50 dark:border-slate-700/80">
           <Star size={14} className="fill-amber-400 stroke-amber-400" />
-          <span className="text-sm font-bold text-slate-800">
+          <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
             {service.rating?.toFixed(1) || "4.8"}
           </span>
           <span className="text-xs text-slate-500 font-medium">
@@ -118,18 +118,18 @@ const ServiceCard = ({ service }) => {
 
       {/* Content Area */}
       <div className="p-6 flex flex-col flex-1">
-        <h3 className="text-lg font-bold text-slate-900 mb-2 line-clamp-1 group-hover:text-indigo-600 transition-colors">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
           {service.title}
         </h3>
-        <p className="text-sm text-slate-500 leading-relaxed mb-6 line-clamp-2">
+        <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6 line-clamp-2">
           {service.description}
         </p>
 
         {/* Info Grid */}
-        <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-slate-50">
-          <div className="flex items-center gap-2 text-slate-600">
-            <div className="p-2 bg-indigo-50 rounded-lg">
-              <Clock size={14} className="text-indigo-600" />
+        <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-slate-50 dark:border-slate-700">
+          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+            <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
+              <Clock size={14} className="text-indigo-600 dark:text-indigo-400" />
             </div>
             <span className="text-xs font-semibold">
               {service.duration || 60} min
@@ -152,7 +152,7 @@ const ServiceCard = ({ service }) => {
                 <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-40" />
               )}
             </div>
-            <span className="text-xs font-semibold truncate max-w-[80px]">
+            <span className="text-xs font-semibold truncate max-w-[80px] dark:text-slate-200">
               {service.provider?.businessName || "Pro"}
             </span>
           </div>
@@ -161,11 +161,11 @@ const ServiceCard = ({ service }) => {
         {/* Footer Area */}
         <div className="flex items-center justify-between mt-auto pt-2">
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-tight">
               Starting at
             </span>
             <div className="flex items-baseline gap-1">
-              <span className="text-xl font-black text-slate-900">
+              <span className="text-xl font-black text-slate-900 dark:text-white">
                 ₹{service.price}
               </span>
             </div>
@@ -173,7 +173,7 @@ const ServiceCard = ({ service }) => {
 
           <Link
             to={`/services/${service._id}`}
-            className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-indigo-600 text-white rounded-2xl text-sm font-bold transition-all duration-300 shadow-lg shadow-slate-200 hover:shadow-indigo-200 active:scale-95"
+            className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-indigo-600 hover:bg-indigo-600 dark:hover:bg-indigo-500 text-white rounded-2xl text-sm font-bold transition-all duration-300 shadow-lg shadow-slate-200 dark:shadow-indigo-900/20 hover:shadow-indigo-200 active:scale-95"
           >
             Details
           </Link>

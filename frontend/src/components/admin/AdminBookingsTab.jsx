@@ -28,78 +28,78 @@ const AdminBookingsTab = ({ bookings = [], fetchAllData }) => {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">System Bookings</h2>
-          <p className="text-slate-500 text-sm font-medium mt-1">
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight transition-colors">System Bookings</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1 transition-colors">
             Global oversight of all platform transactions and service requests.
           </p>
         </div>
         <div className="flex items-center gap-3">
-            <Badge variant="info" className="px-4 py-2 rounded-xl text-xs font-black uppercase">
+            <Badge variant="info" className="px-4 py-2 rounded-xl text-xs font-black uppercase dark:bg-indigo-900/30 dark:text-indigo-400">
                 Total: {bookings.length}
             </Badge>
-            <Badge variant="success" className="px-4 py-2 rounded-xl text-xs font-black uppercase">
+            <Badge variant="success" className="px-4 py-2 rounded-xl text-xs font-black uppercase dark:bg-emerald-900/30 dark:text-emerald-400">
                 Active: {bookings.filter(b => b.status !== 'cancelled').length}
             </Badge>
         </div>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50/50">
-                <th className="px-8 py-6 text-[0.65rem] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Booking Info</th>
-                <th className="px-8 py-6 text-[0.65rem] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Customer</th>
-                <th className="px-8 py-6 text-[0.65rem] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Provider</th>
-                <th className="px-8 py-6 text-[0.65rem] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Amount</th>
-                <th className="px-8 py-6 text-[0.65rem] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Status</th>
-                <th className="px-8 py-6 text-[0.65rem] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Actions</th>
+              <tr className="bg-slate-50/50 dark:bg-slate-800/50 transition-colors">
+                <th className="px-8 py-6 text-[0.65rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">Booking Info</th>
+                <th className="px-8 py-6 text-[0.65rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">Customer</th>
+                <th className="px-8 py-6 text-[0.65rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">Provider</th>
+                <th className="px-8 py-6 text-[0.65rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">Amount</th>
+                <th className="px-8 py-6 text-[0.65rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">Status</th>
+                <th className="px-8 py-6 text-[0.65rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-50 dark:divide-slate-800 transition-colors">
               {bookings.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-8 py-20 text-center text-slate-400 font-medium">
+                  <td colSpan="6" className="px-8 py-20 text-center text-slate-400 dark:text-slate-500 font-medium transition-colors">
                     No bookings found in the system.
                   </td>
                 </tr>
               ) : (
                 bookings.map((booking) => (
-                  <tr key={booking._id} className="hover:bg-slate-50/50 transition-colors group">
-                    <td className="px-8 py-6">
+                  <tr key={booking._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group">
+                    <td className="px-4 md:px-8 py-4 md:py-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100 shadow-sm">
+                        <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/50 shadow-sm transition-colors">
                           <Briefcase size={20} />
                         </div>
                         <div>
-                          <p className="font-black text-slate-900 text-sm tracking-tight">{booking.service?.title || "Unknown Service"}</p>
-                          <div className="flex items-center gap-3 mt-1 text-[0.65rem] font-bold text-slate-400 uppercase tracking-wider">
+                          <p className="font-black text-slate-900 dark:text-white text-sm tracking-tight">{booking.service?.title || "Unknown Service"}</p>
+                          <div className="flex items-center gap-3 mt-1 text-[0.65rem] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                             <span className="flex items-center gap-1"><Calendar size={12} /> {new Date(booking.bookingDate).toLocaleDateString()}</span>
                             <span className="flex items-center gap-1"><Clock size={12} /> {booking.timeSlot}</span>
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-4 md:px-8 py-4 md:py-6">
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-slate-700">{booking.user?.name || "Deleted User"}</span>
-                        <span className="text-[0.65rem] font-medium text-slate-400">{booking.user?.email}</span>
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{booking.user?.name || "Deleted User"}</span>
+                        <span className="text-[0.65rem] font-medium text-slate-400 dark:text-slate-500">{booking.user?.email}</span>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-4 md:px-8 py-4 md:py-6">
                         <div className="flex items-center gap-2">
-                            <User size={14} className="text-slate-300" />
-                            <span className="text-sm font-bold text-slate-700">{booking.provider?.businessName || "Unknown Provider"}</span>
+                            <User size={14} className="text-slate-300 dark:text-slate-600" />
+                            <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{booking.provider?.businessName || "Unknown Provider"}</span>
                         </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-4 md:px-8 py-4 md:py-6">
                       <div className="flex flex-col">
-                        <span className="text-sm font-black text-slate-900">₹{booking.totalAmount}</span>
-                        <span className="text-[0.6rem] font-bold text-emerald-600 uppercase tracking-widest">{booking.paymentMethod}</span>
+                        <span className="text-sm font-black text-slate-900 dark:text-white transition-colors">₹{booking.totalAmount}</span>
+                        <span className="text-[0.6rem] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">{booking.paymentMethod}</span>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
-                      <Badge variant={getStatusColor(booking.status)} className="px-3 py-1 rounded-lg text-[0.6rem] font-black uppercase tracking-widest">
+                    <td className="px-4 md:px-8 py-4 md:py-6">
+                      <Badge variant={getStatusColor(booking.status)} className="px-3 py-1 rounded-lg text-[0.6rem] font-black uppercase tracking-widest dark:bg-slate-800 dark:text-slate-400">
                         {booking.status}
                       </Badge>
                     </td>

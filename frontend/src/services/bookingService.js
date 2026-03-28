@@ -25,4 +25,16 @@ export const bookingService = {
     const response = await api.put(`/bookings/${id}/status`, statusData);
     return response.data;
   },
+  addAdditionalCharge: async (id, chargeData) => {
+    const response = await api.post(`/bookings/${id}/additional-charge`, chargeData);
+    return response.data;
+  },
+  approveAdditionalCharge: async (id, chargeId, status) => {
+    const response = await api.put(`/bookings/${id}/approve-charge/${chargeId}`, { status });
+    return response.data;
+  },
+  cancelBooking: async (id) => {
+    const response = await api.put(`/bookings/${id}/cancel`);
+    return response.data;
+  },
 };

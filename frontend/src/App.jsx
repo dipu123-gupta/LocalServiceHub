@@ -5,6 +5,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import VideoCallOverlay from "./components/VideoCallOverlay";
 import IncomingCallModal from "./components/IncomingCallModal";
 import ProtectedRoute from "./components/common/ProtectedRoute";
+import ScrollToTop from "./components/ScrollToTop";
 
 import Home from "./pages/Home";
 import EmailVerification from "./pages/EmailVerification";
@@ -32,6 +33,7 @@ import ProviderReviews from "./pages/provider/Reviews";
 import ProviderMessages from "./pages/provider/Messages";
 import ProviderMembership from "./pages/provider/Membership";
 import ProviderSafety from "./pages/provider/Safety";
+import ProviderSlotManager from "./pages/provider/SlotManager";
 
 // New Pages
 import About from "./pages/About";
@@ -63,6 +65,16 @@ import { authService } from "./services/authService";
 function App() {
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
+  const { mode } = useSelector((state) => state.theme);
+
+  useEffect(() => {
+    // Sync theme class with document root
+    if (mode === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [mode]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -82,6 +94,7 @@ function App() {
   usePushNotifications();
   return (
     <>
+      <ScrollToTop />
       <Navbar />
       <VideoCallOverlay />
       <IncomingCallModal />
@@ -131,6 +144,7 @@ function App() {
                 <Route path="/provider/messages" element={<ProviderMessages />} />
                 <Route path="/provider/membership" element={<ProviderMembership />} />
                 <Route path="/provider/safety" element={<ProviderSafety />} />
+                <Route path="/provider/slots" element={<ProviderSlotManager />} />
               </Route>
             </Route>
 

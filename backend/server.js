@@ -12,7 +12,7 @@ import connectDB from "./config/db.js";
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 import { initSocket } from "./services/socketService.js";
 import mongoSanitize from "express-mongo-sanitize";
-import xss from "xss-clean";
+// xss-clean removed — deprecated/unmaintained since 2022. Helmet CSP provides XSS protection.
 import hpp from "hpp";
 import { apiLimiter, authLimiter } from "./middlewares/rateLimitMiddleware.js";
 
@@ -89,18 +89,24 @@ app.use(
 
 app.use(
   helmet({
+    crossOriginOpenerPolicy: { policy: "unsafe-none" },
+    crossOriginEmbedderPolicy: false,
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "https://checkout.razorpay.com"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://checkout.razorpay.com", "https://apis.google.com"],
         connectSrc: [
           "'self'",
           "http://localhost:5000",
           "ws://localhost:5000",
+          "http://127.0.0.1:5000",
+          "ws://127.0.0.1:5000",
           "https://firebaseinstallations.googleapis.com",
           "https://fcmregistrations.googleapis.com",
+          "https://identitytoolkit.googleapis.com",
+          "https://securetoken.google.com",
         ],
-        imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
+        imgSrc: ["'self'", "data:", "https://res.cloudinary.com", "https://lh3.googleusercontent.com"],
         styleSrc: ["'self'", "'unsafe-inline'"],
       },
     },
@@ -111,23 +117,25 @@ app.use(cookieParser());
 
 // Security Middlewares
 app.use(mongoSanitize()); // Prevent NoSQL Injection
-app.use(xss()); // Prevent XSS Attacks
+// xss-clean removed — deprecated. Helmet CSP + mongoSanitize provide sufficient protection.
 app.use(hpp()); // Prevent HTTP Parameter Pollution
 
 // Rate Limiting
 app.use("/api", apiLimiter); // Apply general API limits
 app.use("/api/auth", authLimiter); // Stricter limits for auth (Login/Register)
 
-// Diagnostic Middleware
-app.use((req, res, next) => {
-  console.log(`🔍 [${new Date().toISOString()}] ${req.method} ${req.url}`);
-  res.on("finish", () => {
-    console.log(
-      `✅ [${new Date().toISOString()}] ${req.method} ${req.url} ${res.statusCode}`,
-    );
+// Diagnostic Middleware (development only — Morgan handles production logging)
+if (process.env.NODE_ENV !== "production") {
+  app.use((req, res, next) => {
+    console.log(`🔍 [${new Date().toISOString()}] ${req.method} ${req.url}`);
+    res.on("finish", () => {
+      console.log(
+        `✅ [${new Date().toISOString()}] ${req.method} ${req.url} ${res.statusCode}`,
+      );
+    });
+    next();
   });
-  next();
-});
+}
 
 // Routes
 app.use("/api/auth", authRoutes);

@@ -24,22 +24,10 @@ const themeSlice = createSlice({
     toggleTheme: (state) => {
       state.mode = state.mode === "light" ? "dark" : "light";
       localStorage.setItem("theme", state.mode);
-      
-      if (state.mode === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
     },
     setTheme: (state, action) => {
       state.mode = action.payload;
       localStorage.setItem("theme", state.mode);
-      
-      if (state.mode === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
     },
   },
 });

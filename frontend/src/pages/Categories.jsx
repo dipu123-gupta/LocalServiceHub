@@ -45,9 +45,9 @@ const Categories = () => {
     fetchCategories();
   }, []);
   return (
-    <div className="min-h-screen bg-slate-50 pb-24">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20 transition-colors duration-300">
       {/* Hero Section */}
-      <div className="bg-slate-900 pt-32 pb-40 px-4 relative overflow-hidden">
+      <div className="bg-slate-900 pt-24 pb-32 md:pt-32 md:pb-40 px-4 relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] -mr-64 -mt-64" />
           <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px] -ml-64 -mb-64" />
@@ -76,7 +76,7 @@ const Categories = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight"
+              className="text-3xl sm:text-4xl md:text-6xl font-black text-white mb-6 tracking-tight leading-tight"
             >
               Explore Our <span className="text-indigo-400">Services</span>
             </motion.h1>
@@ -111,7 +111,7 @@ const Categories = () => {
             >
               <Link
                 to={`/services?category=${cat.name}`}
-                className="group flex flex-col h-full bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-slate-200/50 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden relative"
+                className="group flex flex-col h-full bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden relative"
               >
                 <div className={`absolute top-0 right-0 w-32 h-32 ${cat.color} opacity-0 group-hover:opacity-100 rounded-full -mr-16 -mt-16 blur-2xl transition-opacity duration-700`} />
                 
@@ -121,19 +121,19 @@ const Categories = () => {
                   </div>
                   
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-black text-slate-900 leading-none">{cat.name}</h3>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white leading-none">{cat.name}</h3>
                     {idx < 3 && (
-                      <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 text-amber-600 text-[9px] font-black uppercase rounded-lg border border-amber-100">
+                      <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[9px] font-black uppercase rounded-lg border border-amber-100 dark:border-amber-800/50">
                         <TrendingUp size={10} /> Popular
                       </div>
                     )}
                   </div>
                   
-                  <p className="text-slate-500 font-bold text-sm mb-8 leading-relaxed">
+                  <p className="text-slate-500 dark:text-slate-400 font-bold text-sm mb-8 leading-relaxed">
                     {cat.desc}
                   </p>
                   
-                  <div className="mt-auto flex items-center gap-2 text-indigo-600 font-black text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="mt-auto flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-black text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
                     Browse services <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
@@ -148,23 +148,23 @@ const Categories = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="mt-24 p-12 bg-white rounded-[3.5rem] border border-slate-100 shadow-xl flex flex-col md:flex-row items-center justify-between gap-12 relative overflow-hidden"
+          className="mt-16 md:mt-24 p-6 md:p-12 bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[3.5rem] border border-slate-100 dark:border-slate-800 shadow-xl dark:shadow-none flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 relative overflow-hidden transition-colors duration-300"
         >
-          <div className="absolute top-0 left-0 w-full h-full bg-slate-50 opacity-50" />
+          <div className="absolute top-0 left-0 w-full h-full bg-slate-50 dark:bg-slate-800 opacity-50" />
           <div className="relative z-10 max-w-xl text-center md:text-left">
-            <div className="mb-4 inline-flex items-center justify-center p-3 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-100">
+            <div className="mb-4 inline-flex items-center justify-center p-3 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-100 dark:shadow-none">
               <Sparkles size={24} />
             </div>
-            <h2 className="text-3xl font-black text-slate-900 mb-4">Can't find what you're looking for?</h2>
-            <p className="text-slate-500 font-bold leading-relaxed">
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4">Can't find what you're looking for?</h2>
+            <p className="text-slate-500 dark:text-slate-400 font-bold leading-relaxed">
               Our experts are constantly expanding. Tell us what you need and we'll help you find the right pro or notify you when they're available.
             </p>
           </div>
-          <div className="relative z-10 flex gap-4">
-            <button className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black hover:bg-slate-800 transition-all active:scale-95">
+          <div className="relative z-10 flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+            <button className="w-full sm:w-auto px-8 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl font-black hover:bg-slate-800 dark:hover:bg-slate-700 transition-all active:scale-95 text-sm">
               Contact Support
             </button>
-            <Link to="/services" className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition-all active:scale-95 shadow-xl shadow-indigo-100">
+            <Link to="/services" className="w-full sm:w-auto px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition-all active:scale-95 shadow-xl shadow-indigo-100 dark:shadow-none text-center text-sm">
               View All Services
             </Link>
           </div>

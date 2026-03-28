@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const Tabs = ({ tabs, activeTab, onChange, className = "" }) => {
   return (
-    <div className={`flex flex-wrap gap-2 p-1 bg-gray-100/50 rounded-2xl border border-gray-100 ${className}`}>
+    <div className={`flex flex-nowrap overflow-x-auto gap-2 p-1 bg-gray-100/50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-700/50 scrollbar-hide ${className} transition-colors duration-300`}>
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         return (
@@ -11,13 +11,13 @@ const Tabs = ({ tabs, activeTab, onChange, className = "" }) => {
             key={tab.id}
             onClick={() => onChange(tab.id)}
             className={`relative px-6 py-2.5 text-sm font-bold transition-all duration-300 rounded-xl flex items-center gap-2 ${
-              isActive ? "text-indigo-600" : "text-gray-500 hover:text-gray-700"
+              isActive ? "text-indigo-600 dark:text-indigo-400" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             }`}
           >
             {isActive && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 bg-white shadow-sm border border-gray-100 rounded-xl"
+                className="absolute inset-0 bg-white dark:bg-slate-900 shadow-sm border border-gray-100 dark:border-slate-700 rounded-xl"
                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
               />
             )}
