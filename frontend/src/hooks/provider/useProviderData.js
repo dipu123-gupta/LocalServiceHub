@@ -48,20 +48,14 @@ const useProviderData = (userInfo) => {
   const fetchProviderServices = async () => {
     setServicesLoading(true);
     try {
-      const { data } = await api.get("/services");
       if (userInfo.role === "admin") {
+        // Admin sees all services
+        const { data } = await api.get("/services");
         setProviderServices(data);
       } else {
-        const filtered = data.filter((s) => {
-          const serviceProviderId = s.provider?._id || s.provider;
-          const serviceUserId = s.provider?.user?._id || s.provider?.user;
-          
-          return (
-            serviceUserId === userInfo?._id ||
-            serviceProviderId === providerProfile?._id
-          );
-        });
-        setProviderServices(filtered);
+        // Providers use the dedicated /services/my endpoint (server-side filtering)
+        const { data } = await api.get("/services/my");
+        setProviderServices(data);
       }
     } catch (err) {
       console.error("Failed to load services", err);
