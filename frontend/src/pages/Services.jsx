@@ -11,9 +11,12 @@ import {
   MapPin,
   Star,
   ArrowUpDown,
-  Filter
+  Filter,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Pagination from "../components/common/Pagination";
 
 const sortOptions = [
   { label: "Recommended", value: "" },
@@ -36,7 +39,7 @@ const Services = () => {
   const initialCategory = queryParams.get("category") || "All";
 
   const [services, setServices] = useState([]);
-  const [categories, setCategories] = useState(["All"]);
+  const [categories, setCategories] = useState([{ _id: "All", name: "All" }]);
   const [filtered, setFiltered] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -48,12 +51,15 @@ const Services = () => {
   const [userCity, setUserCity] = useState(
     localStorage.getItem("userCity") || "",
   );
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
 
   useEffect(() => {
     const fetchMetadata = async () => {
       try {
         const { data } = await api.get("/categories");
-        setCategories(["All", ...data.map(c => c.name)]);
+        setCategories([{ _id: "All", name: "All" }, ...data]);
       } catch (err) {
         console.error("Failed to load categories", err);
       }
@@ -77,17 +83,40 @@ const Services = () => {
         const uLat = localStorage.getItem("userLat");
         const uLng = localStorage.getItem("userLng");
 
-        let params = [];
-        if (uCity && uCity !== "Select City")
-          params.push(`city=${encodeURIComponent(uCity)}`);
-        if (uLat && uLng) {
-          params.push(`lat=${uLat}&lng=${uLng}`);
-        }
-        const qs = params.length > 0 ? `?${params.join("&")}` : "";
+        // Find the category ID if its not "All"
+        const categoryObj = categories.find(c => c.name === selectedCategory || c._id === selectedCategory);
+        const categoryId = categoryObj && categoryObj._id !== "All" ? categoryObj._id : undefined;
 
-        const { data } = await api.get(`/services${qs}`);
-        setServices(data);
-        setFiltered(data);
+        const params = {
+          page,
+          limit: 10,
+          search: search || undefined,
+          category: categoryId,
+          sort: selectedSort || undefined,
+          minRating: minRating > 0 ? minRating : undefined,
+        };
+
+        if (uCity && uCity !== "Select City") params.city = uCity;
+        if (uLat && uLng) {
+          params.lat = uLat;
+          params.lng = uLng;
+        }
+
+        const { min, max } = priceRanges[priceRange];
+        if (min > 0) params.minPrice = min;
+        if (max !== Infinity) params.maxPrice = max;
+
+        const queryStr = Object.keys(params)
+          .filter(key => params[key] !== undefined)
+          .map(key => `${key}=${encodeURIComponent(params[key])}`)
+          .join("&");
+
+        const { data } = await api.get(`/services?${queryStr}`);
+        
+        setServices(data.services || []);
+        setFiltered(data.services || []);
+        setTotalPages(data.pages || 1);
+        setTotalResults(data.total || 0);
       } catch (err) {
         console.error("Failed to load services", err);
       } finally {
@@ -95,37 +124,12 @@ const Services = () => {
       }
     };
     fetchServices();
-  }, [userCity]);
+  }, [userCity, page, search, selectedCategory, selectedSort, priceRange, minRating]);
 
   useEffect(() => {
-    let result = [...services];
-    const { min, max } = priceRanges[priceRange];
-
-    if (search)
-      result = result.filter(
-        (s) =>
-          s.title?.toLowerCase().includes(search.toLowerCase()) ||
-          s.description?.toLowerCase().includes(search.toLowerCase()),
-      );
-    if (selectedCategory !== "All")
-      result = result.filter((s) => s.category?.name === selectedCategory);
-    
-    // Price Filter
-    result = result.filter((s) => s.price >= min && s.price <= max);
-
-    // Rating Filter
-    if (minRating > 0) {
-      result = result.filter((s) => (s.rating || 0) >= minRating);
-    }
-
-    if (selectedSort === "price_asc") result.sort((a, b) => a.price - b.price);
-    else if (selectedSort === "price_desc")
-      result.sort((a, b) => b.price - a.price);
-    else if (selectedSort === "rating")
-      result.sort((a, b) => b.rating - a.rating);
-
-    setFiltered(result);
-  }, [search, selectedCategory, selectedSort, priceRange, minRating, services]);
+    // Reset to page 1 when filters change
+    setPage(1);
+  }, [search, selectedCategory, selectedSort, priceRange, minRating]);
 
   const clearFilters = () => {
     setSearch("");
@@ -264,15 +268,15 @@ const Services = () => {
                   <div className="flex flex-wrap gap-2">
                     {categories.map((cat) => (
                       <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
+                        key={cat.name}
+                        onClick={() => setSelectedCategory(cat.name)}
                         className={`px-4 py-2 rounded-xl text-[10px] font-bold transition-all border ${
-                          selectedCategory === cat 
+                          selectedCategory === cat.name 
                             ? "bg-indigo-600 border-indigo-600 text-white shadow-lg" 
                             : "bg-slate-50 dark:bg-slate-800 border-transparent text-slate-500 hover:bg-slate-100 dark:text-slate-400"
                         }`}
                       >
-                        {cat}
+                        {cat.name}
                       </button>
                     ))}
                   </div>
@@ -389,7 +393,7 @@ const Services = () => {
             <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                  {isLoading ? "Fetching experts..." : `${filtered.length} Experts Handpicked`}
+                  {isLoading ? "Fetching experts..." : `${totalResults} Experts Handpicked`}
                 </h2>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Found in {userCity || "nearby locations"}</p>
               </div>
@@ -432,8 +436,12 @@ const Services = () => {
                   <div className="w-24 h-24 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Filter size={40} className="text-slate-200 dark:text-slate-700" />
                   </div>
-                  <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Well, this is empty!</h3>
-                  <p className="text-slate-400 dark:text-slate-500 font-bold mb-8">Try clearing some filters or searching for something else.</p>
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">No experts found here!</h3>
+                  <p className="text-slate-400 dark:text-slate-500 font-bold mb-8">
+                    {userCity && userCity !== "Select City" 
+                      ? `We haven't launched in ${userCity} yet. Try switching to "Select City" to see global providers!` 
+                      : "Try clearing some filters or searching for something else."}
+                  </p>
                   <button 
                     onClick={clearFilters}
                     className="px-8 py-4 bg-indigo-600 text-white rounded-[1.5rem] font-black hover:bg-slate-900 dark:hover:bg-indigo-500 hover:shadow-xl transition-all active:scale-95"
@@ -459,6 +467,12 @@ const Services = () => {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            <Pagination 
+              currentPage={page} 
+              totalPages={totalPages} 
+              onPageChange={(p) => setPage(p)} 
+            />
           </div>
         </div>
       </main>

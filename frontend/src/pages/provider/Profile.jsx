@@ -74,11 +74,13 @@ const Profile = () => {
       setCategories(categoriesRes.data);
       
       setFormData({
+        ...formData,
         businessName: p.businessName || "",
         description: p.description || "",
         experience: p.experience || "",
         serviceArea: p.serviceArea || "",
         category: p.category?._id || p.category || "",
+        name: userInfo?.name || "",
         phone: userInfo?.phone || "",
         skills: p.skills?.join(", ") || "",
         bankDetails: {

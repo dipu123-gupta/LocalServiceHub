@@ -13,6 +13,8 @@ import {
   Send,
   Loader2,
   LayoutDashboard,
+  LifeBuoy,
+  History,
 } from "lucide-react";
 
 import useAdminData from "../hooks/admin/useAdminData";
@@ -26,6 +28,8 @@ import AdminWithdrawalsTab from "../components/admin/AdminWithdrawalsTab";
 import AdminAnnouncementsTab from "../components/admin/AdminAnnouncementsTab";
 import AdminBookingsTab from "../components/admin/AdminBookingsTab";
 import AdminFinancialTab from "../components/admin/AdminFinancialTab";
+import AdminSupportTab from "../components/admin/AdminSupportTab";
+import AdminAuditLogsTab from "../components/admin/AdminAuditLogsTab";
 import api from "@/utils/api";
 import Tabs from "../components/common/Tabs";
 import Button from "../components/common/Button";
@@ -245,6 +249,8 @@ const AdminDashboard = () => {
     { id: "financials", label: "Financials", icon: <CreditCard size={18} /> },
     { id: "withdrawals", label: "Withdrawals", icon: <Landmark size={18} /> },
     { id: "announcements", label: "Announcements", icon: <Send size={18} /> },
+    { id: "support", label: "Support Tickets", icon: <LifeBuoy size={18} /> },
+    { id: "audit", label: "Audit Logs", icon: <History size={18} /> },
   ];
 
   return (
@@ -375,6 +381,9 @@ const AdminDashboard = () => {
               fetchAllData={fetchAllData}
             />
           )}
+
+          {activeTab === "support" && <AdminSupportTab />}
+          {activeTab === "audit" && <AdminAuditLogsTab />}
         </main>
       </div>
     </div>

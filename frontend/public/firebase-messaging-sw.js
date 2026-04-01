@@ -4,12 +4,12 @@ importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js")
 
 // Initialize the Firebase app in the service worker by passing the config object
 const firebaseConfig = {
-  apiKey: "AIzaSyBbCYYmpb19bHgMDK94sQMcnySlBdrx5WQ",
-  authDomain: "localservicehub-72d91.firebaseapp.com",
-  projectId: "localservicehub-72d91",
-  storageBucket: "localservicehub-72d91.firebasestorage.app",
-  messagingSenderId: "1838064931",
-  appId: "1:1838064931:web:73321286c50a2df07c9896",
+  apiKey: "YOUR_FIREBASE_API_KEY",
+  authDomain: "YOUR_FIREBASE_AUTH_DOMAIN",
+  projectId: "YOUR_FIREBASE_PROJECT_ID",
+  storageBucket: "YOUR_FIREBASE_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_FIREBASE_MESSAGING_SENDER_ID",
+  appId: "YOUR_FIREBASE_APP_ID",
 };
 
 firebase.initializeApp(firebaseConfig);

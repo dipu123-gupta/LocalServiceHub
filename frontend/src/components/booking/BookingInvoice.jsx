@@ -1,14 +1,24 @@
-import React from "react";
-import { Download, FileText, CheckCircle, ShieldCheck, Printer, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Download, FileText, CheckCircle, ShieldCheck, Printer, X, Loader2 } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
+import { bookingService } from "../../services/bookingService";
+import toast from "react-hot-toast";
+import { useState } from "react";
 
 const BookingInvoice = ({ isOpen, onClose, booking }) => {
+  const [downloading, setDownloading] = useState(false);
+
   if (!isOpen || !booking) return null;
 
-  const basePrice = booking.totalAmount - (booking.additionalCharges?.filter(c => c.approvalStatus === "approved").reduce((sum, c) => sum + c.price, 0) || 0);
-  const approvedExtra = booking.additionalCharges?.filter(c => c.approvalStatus === "approved") || [];
-  const extraTotal = approvedExtra.reduce((sum, c) => sum + c.price, 0);
-  
+  const basePrice =
+    booking.totalAmount -
+    (booking.additionalCharges
+      ?.filter((c) => c.approvalStatus === "approved")
+      .reduce((sum, c) => sum + c.price, 0) || 0);
+  const approvedExtra =
+    booking.additionalCharges?.filter((c) => c.approvalStatus === "approved") ||
+    [];
+  // basePrice/approvedExtra already render the breakdown; keep calculations minimal.
+
   // Tax calculation (Inclusive 18% GST)
   const totalAmount = booking.totalAmount;
   const subtotal = totalAmount / 1.18;
@@ -18,23 +28,34 @@ const BookingInvoice = ({ isOpen, onClose, booking }) => {
     window.print();
   };
 
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      const data = await bookingService.downloadInvoice(booking._id);
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `invoice-${booking._id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success("Invoice downloaded successfully!");
+    } catch {
+      toast.error("Failed to download PDF invoice");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 sm:p-6 print:p-0">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+        <div
           onClick={onClose}
           className="absolute inset-0 bg-slate-950/60 backdrop-blur-md print:hidden"
         />
         
-        <motion.div
-          initial={{ opacity: 0, y: 100 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 100 }}
-          className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 print:shadow-none print:border-none print:rounded-none transition-colors"
-        >
+        <div className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 print:shadow-none print:border-none print:rounded-none transition-colors">
           {/* Action Header (Hidden on Print) */}
           <div className="flex items-center justify-between p-6 border-b border-slate-50 dark:border-slate-800 print:hidden bg-slate-50/50 dark:bg-slate-800/50 transition-colors">
             <div className="flex items-center gap-3">
@@ -45,11 +66,23 @@ const BookingInvoice = ({ isOpen, onClose, booking }) => {
             </div>
             <div className="flex items-center gap-3">
               <button 
+                onClick={handleDownload}
+                disabled={downloading}
+                className="p-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all border border-transparent shadow-lg shadow-indigo-100 dark:shadow-none flex items-center gap-2 group disabled:opacity-50"
+              >
+                {downloading ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <Download size={16} className="group-hover:translate-y-0.5 transition-transform" />
+                )}
+                <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Download PDF</span>
+              </button>
+              <button 
                 onClick={handlePrint}
-                className="p-3 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl hover:bg-slate-900 dark:hover:bg-indigo-600 hover:text-white transition-all border border-slate-100 dark:border-slate-700 shadow-sm flex items-center gap-2 group"
+                className="p-3 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all border border-slate-100 dark:border-slate-700 shadow-sm flex items-center gap-2 group"
               >
                 <Printer size={16} className="group-hover:scale-110 transition-transform" />
-                <span className="text-[10px] font-black uppercase tracking-widest">Print / PDF</span>
+                <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Print</span>
               </button>
               <button 
                 onClick={onClose}
@@ -106,7 +139,7 @@ const BookingInvoice = ({ isOpen, onClose, booking }) => {
                </div>
                <div className="md:text-right">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Service Provider</p>
-                  <p className="text-lg font-black text-slate-900 dark:text-white">{booking.provider?.name || "Verified Professional"}</p>
+                   <p className="text-lg font-black text-slate-900 dark:text-white">{booking.provider?.businessName || booking.provider?.name || "Verified Professional"}</p>
                   <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mt-2">HomeServiceHub Partner Network</p>
                   <p className="text-sm font-bold text-slate-500 dark:text-slate-400">Verified & Insured Professional</p>
                   <div className="flex items-center gap-2 justify-end mt-4">
@@ -184,7 +217,7 @@ const BookingInvoice = ({ isOpen, onClose, booking }) => {
                </p>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </AnimatePresence>
   );

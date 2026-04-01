@@ -14,6 +14,7 @@ import {
   Wallet,
   Heart,
   Gift,
+  LifeBuoy,
 } from "lucide-react";
 
 import WalletTab from "../components/WalletTab";
@@ -30,6 +31,7 @@ import Tabs from "../components/common/Tabs";
 import Button from "../components/common/Button";
 import Badge from "../components/common/Badge";
 import Notifications from "./Notifications";
+import SupportTickets from "../components/support/SupportTickets";
 import { useSocket } from "../store/context/SocketContext";
 
 const Dashboard = () => {
@@ -52,7 +54,8 @@ const Dashboard = () => {
     "/membership": "membership",
     "/profile": "profile",
     "/settings": "settings",
-    "/notifications": "notifications"
+    "/notifications": "notifications",
+    "/support": "support",
   }), []);
 
   const [activeTab, setActiveTab] = useState(() => {
@@ -149,7 +152,7 @@ const Dashboard = () => {
     setBookingsLoading(true);
     try {
       const { data } = await api.get("/bookings/mybookings");
-      setBookings(data);
+      setBookings(data.bookings || []);
     } catch (err) {
       console.error("Could not load bookings", err);
     } finally {
@@ -233,10 +236,10 @@ const Dashboard = () => {
     }
   };
 
-  const totalSpent = bookings
+  const totalSpent = (bookings || [])
     .filter((b) => b.status === "completed")
     .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
-  const completedBookings = bookings.filter(
+  const completedBookings = (bookings || []).filter(
     (b) => b.status === "completed",
   ).length;
 
@@ -255,6 +258,7 @@ const Dashboard = () => {
     },
     { id: "profile", label: "Profile", icon: <User size={16} /> },
     { id: "settings", label: "Settings", icon: <Settings size={16} /> },
+    { id: "support", label: "Support", icon: <LifeBuoy size={16} /> },
   ];
 
   if (!userInfo) return null;
@@ -361,6 +365,7 @@ const Dashboard = () => {
               handleLogout={handleLogout}
             />
           )}
+          {activeTab === "support" && <SupportTickets />}
         </main>
       </div>
     </div>

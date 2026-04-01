@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import api from "@/utils/api";
 import { useSocket } from "../../store/context/SocketContext";
 import { useVideoCall } from "../../store/context/VideoCallContext";
 

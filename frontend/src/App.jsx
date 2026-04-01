@@ -34,6 +34,7 @@ import ProviderMessages from "./pages/provider/Messages";
 import ProviderMembership from "./pages/provider/Membership";
 import ProviderSafety from "./pages/provider/Safety";
 import ProviderSlotManager from "./pages/provider/SlotManager";
+import ProviderSupport from "./pages/provider/Support";
 
 // New Pages
 import About from "./pages/About";
@@ -145,6 +146,7 @@ function App() {
                 <Route path="/provider/membership" element={<ProviderMembership />} />
                 <Route path="/provider/safety" element={<ProviderSafety />} />
                 <Route path="/provider/slots" element={<ProviderSlotManager />} />
+                <Route path="/provider/support" element={<ProviderSupport />} />
               </Route>
             </Route>
 

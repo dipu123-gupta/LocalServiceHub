@@ -66,7 +66,7 @@ const Bookings = () => {
     setLoading(true);
     try {
       const { data } = await api.get("/bookings/provider");
-      setBookings(data);
+      setBookings(data.bookings || []);
     } catch (err) {
       console.error("Failed to load bookings", err);
     } finally {
@@ -181,7 +181,7 @@ const Bookings = () => {
             Job <span className="text-indigo-600 dark:text-indigo-400 font-black">Bookings</span>
           </h1>
           <p className="text-slate-500 dark:text-slate-400 font-bold mt-2 transition-colors">
-            You have {bookings.filter((b) => b.status === "pending").length} new
+            You have {(bookings || []).filter((b) => b.status === "pending").length} new
             requests waiting for your approval.
           </p>
         </div>

@@ -32,14 +32,14 @@ const useAdminData = (userInfo) => {
           api.get("/bookings"),
           api.get("/bookings/admin/transactions"),
         ]);
-      setUsers(uRes.data);
+      setUsers(uRes.data.users || []);
       setCategories(cRes.data);
-      setServices(sRes.data);
+      setServices(sRes.data.services || []);
       setPendingProviders(pRes.data);
       setCities(cityRes.data);
       setStats(statsRes.data);
       setAnnouncements(aRes.data);
-      setBookings(bRes.data);
+      setBookings(bRes.data.bookings || []);
       setPaymentTransactions(ptRes.data);
 
       const [wRes] = await Promise.all([api.get("/withdrawals")]);

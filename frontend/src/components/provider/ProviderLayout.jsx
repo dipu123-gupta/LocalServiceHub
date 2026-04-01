@@ -13,8 +13,9 @@ import {
   Menu,
   X,
   Bell,
+  Clock,
   LogOut,
-  Clock
+  LifeBuoy,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../store/authSlice";
@@ -36,6 +37,7 @@ const ProviderLayout = () => {
     { name: "Membership", path: "/provider/membership", icon: BadgeCheck },
     { name: "Trust & Safety", path: "/provider/safety", icon: ShieldCheck },
     { name: "Profile", path: "/provider/profile", icon: UserCircle },
+    { name: "Support", path: "/provider/support", icon: LifeBuoy },
   ];
 
   const handleLogout = () => {

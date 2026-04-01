@@ -40,4 +40,19 @@ export const authService = {
     const response = await api.post("/auth/google", { idToken });
     return response.data;
   },
+
+  setupMFA: async () => {
+    const response = await api.post("/auth/mfa/setup");
+    return response.data;
+  },
+
+  verifyMFA: async (token) => {
+    const response = await api.post("/auth/mfa/verify", { token });
+    return response.data;
+  },
+
+  loginVerifyMFA: async (userId, token) => {
+    const response = await api.post("/auth/mfa/login-verify", { userId, token });
+    return response.data;
+  },
 };

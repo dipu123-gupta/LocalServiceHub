@@ -22,8 +22,20 @@ const authSlice = createSlice({
       state.userInfo = { ...state.userInfo, ...action.payload };
       localStorage.setItem("userInfo", JSON.stringify(state.userInfo));
     },
+    setMFARequired: (state, action) => {
+      state.mfaRequired = action.payload; // { userId, email }
+    },
+    clearMFARequired: (state) => {
+      state.mfaRequired = null;
+    },
   },
 });
 
-export const { setCredentials, logout, updateUserInfo } = authSlice.actions;
+export const {
+  setCredentials,
+  logout,
+  updateUserInfo,
+  setMFARequired,
+  clearMFARequired,
+} = authSlice.actions;
 export default authSlice.reducer;

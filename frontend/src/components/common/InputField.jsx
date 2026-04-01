@@ -27,7 +27,7 @@ const InputField = ({
       <input
         type={type}
         placeholder={placeholder}
-        value={value}
+        value={value || ""}
         onChange={onChange}
         required={required}
         minLength={minLength}

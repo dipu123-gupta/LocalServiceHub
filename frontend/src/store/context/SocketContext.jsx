@@ -15,9 +15,8 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (userInfo?._id) {
-      console.log("Socket Attempting connection to:", SOCKET_URL, "for user:", userInfo._id);
+      console.log("Socket Attempting connection to:", SOCKET_URL);
       const newSocket = io(SOCKET_URL, {
-        query: { userId: userInfo._id },
         transports: ["websocket", "polling"],
         withCredentials: true,
       });

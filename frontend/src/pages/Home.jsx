@@ -14,7 +14,7 @@ import { Loader2 } from "lucide-react";
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
-  const [services, setServices] = useState([]);
+  const [services, setServices] = useState([]); // Array will be data.services
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [userCity, setUserCity] = useState(
@@ -55,7 +55,7 @@ const Home = () => {
         ]);
 
         setCategories(categoriesData);
-        setServices(servicesData);
+        setServices(servicesData?.services || []); // Extract from object
       } catch (err) {
         console.error("Failed to load home data", err);
       } finally {

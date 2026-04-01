@@ -6,7 +6,7 @@ import ReviewModal from "./ReviewModal";
 import ApproveChargesModal from "../booking/ApproveChargesModal";
 import BookingInvoice from "../booking/BookingInvoice";
 
-const UserBookingsTab = ({ bookings, bookingsLoading, navigate, onCancel, refreshBookings }) => {
+const UserBookingsTab = ({ bookings = [], bookingsLoading, navigate, onCancel, refreshBookings }) => {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [isApproveOpen, setIsApproveOpen] = useState(false);
@@ -72,7 +72,7 @@ const UserBookingsTab = ({ bookings, bookingsLoading, navigate, onCancel, refres
 
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight transition-colors">
-          All Bookings ({bookings.length})
+          All Bookings ({(bookings || []).length})
         </h2>
       </div>
 
@@ -80,7 +80,7 @@ const UserBookingsTab = ({ bookings, bookingsLoading, navigate, onCancel, refres
         <div className="flex justify-center py-20">
           <Loader2 className="w-10 h-10 text-indigo-600 dark:text-indigo-400 animate-spin transition-colors" />
         </div>
-      ) : bookings.length === 0 ? (
+      ) : (bookings || []).length === 0 ? (
         <div className="text-center py-20 px-6">
           <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6 transition-colors">
             <BookOpen className="text-slate-300 dark:text-slate-600" size={40} />
@@ -95,7 +95,7 @@ const UserBookingsTab = ({ bookings, bookingsLoading, navigate, onCancel, refres
         </div>
       ) : (
         <div className="flex flex-col gap-6">
-          {bookings.map((b) => {
+          {(bookings || []).map((b) => {
             const pendingCharges = b.additionalCharges?.filter(c => c.approvalStatus === "pending") || [];
             const hasPendingCharges = pendingCharges.length > 0;
             const isConfirmed = ["accepted", "on-the-way", "started"].includes(b.status);

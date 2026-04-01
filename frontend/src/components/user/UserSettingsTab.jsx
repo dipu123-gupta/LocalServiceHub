@@ -1,6 +1,9 @@
-import { LogOut, ShieldCheck, Key } from "lucide-react";
+import { LogOut, ShieldCheck, Key, Shield } from "lucide-react";
 import InputField from "../common/InputField";
 import Button from "../common/Button";
+import { useState } from "react";
+import MFASetup from "../auth/MFASetup";
+import { useSelector } from "react-redux";
 
 const UserSettingsTab = ({
   currentPassword,
@@ -11,6 +14,9 @@ const UserSettingsTab = ({
   pwLoading,
   handleLogout,
 }) => {
+  const [showMfaSetup, setShowMfaSetup] = useState(false);
+  const { userInfo } = useSelector((state) => state.auth);
+
   return (
     <div className="max-w-2xl flex flex-col gap-8">
       {/* Security Settings */}
@@ -60,6 +66,49 @@ const UserSettingsTab = ({
             </Button>
           </div>
         </form>
+      </div>
+
+      {/* MFA Settings */}
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+            <Shield className="text-blue-600 dark:text-blue-400" size={24} />
+          </div>
+          <div>
+            <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+              Two-Factor Authentication (2FA)
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-0.5">
+              Add an extra layer of security to your account.
+            </p>
+          </div>
+        </div>
+
+        {userInfo?.isTwoFactorEnabled ? (
+          <div className="p-6 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center">
+                <ShieldCheck size={18} />
+              </div>
+              <span className="text-sm font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">2FA is Enabled</span>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {showMfaSetup ? (
+              <MFASetup onComplete={() => setShowMfaSetup(false)} />
+            ) : (
+              <div className="p-6 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl flex flex-col items-center text-center gap-4">
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-md">
+                  Protect your account with a secondary verification code using apps like Google Authenticator or Authy.
+                </p>
+                <Button onClick={() => setShowMfaSetup(true)}>
+                  Enable 2FA Now
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Danger Zone */}
