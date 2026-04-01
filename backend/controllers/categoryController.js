@@ -1,5 +1,6 @@
 import Category from "../models/Category.js";
 import asyncHandler from "express-async-handler";
+import logAction from "../utils/auditLogger.js";
 
 // @desc    Get all categories
 // @route   GET /api/categories
@@ -34,6 +35,14 @@ const createCategory = asyncHandler(async (req, res) => {
     image,
   });
 
+  await logAction(
+    req,
+    "CREATE_CATEGORY",
+    category._id,
+    "Category",
+    `Category "${category.name}" was created.`
+  );
+
   res.status(201).json(category);
 });
 
@@ -50,6 +59,15 @@ const updateCategory = asyncHandler(async (req, res) => {
     category.image = req.body.image || category.image;
 
     const updatedCategory = await category.save();
+
+    await logAction(
+      req,
+      "UPDATE_CATEGORY",
+      category._id,
+      "Category",
+      `Category "${category.name}" was updated.`
+    );
+
     res.json(updatedCategory);
   } else {
     res.status(404);
@@ -64,7 +82,17 @@ const deleteCategory = asyncHandler(async (req, res) => {
   const category = await Category.findById(req.params.id);
 
   if (category) {
+    const categoryName = category.name;
     await category.deleteOne();
+
+    await logAction(
+      req,
+      "DELETE_CATEGORY",
+      req.params.id,
+      "Category",
+      `Category "${categoryName}" was removed.`
+    );
+
     res.json({ message: "Category removed" });
   } else {
     res.status(404);
@@ -81,6 +109,15 @@ const toggleCategoryStatus = asyncHandler(async (req, res) => {
   if (category) {
     category.isActive = !category.isActive;
     await category.save();
+
+    await logAction(
+      req,
+      "UPDATE_CATEGORY",
+      category._id,
+      "Category",
+      `Category "${category.name}" status toggled to ${category.isActive ? "Active" : "Inactive"}.`
+    );
+
     res.json(category);
   } else {
     res.status(404);

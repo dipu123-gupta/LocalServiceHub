@@ -14,7 +14,11 @@ export const getSettings = asyncHandler(async (req, res) => {
 // @access  Private
 export const getSettingByKey = asyncHandler(async (req, res) => {
   const setting = await Setting.findOne({ key: req.params.key });
+  
   if (!setting) {
+    if (req.params.key === "platformCommissionPercentage") {
+      return res.status(200).json({ key: req.params.key, value: 15 });
+    }
     res.status(404);
     throw new Error("Setting not found");
   }

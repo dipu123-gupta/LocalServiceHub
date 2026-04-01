@@ -5,7 +5,7 @@ import { sendPushNotification } from "../services/pushNotificationService.js";
 import { emitToUser } from "../services/socketService.js";
 
 // @desc    Helper: Create notification and send real-time
-export const createNotification = async (
+const createNotification = async (
   io,
   { recipient, title, message, type, link, data },
 ) => {
@@ -138,4 +138,5 @@ export {
   markAllAsRead,
   saveToken,
   removeToken,
+  createNotification,
 };

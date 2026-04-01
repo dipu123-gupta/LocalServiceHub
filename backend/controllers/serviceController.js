@@ -3,6 +3,8 @@ import Category from "../models/Category.js";
 import ServiceProvider from "../models/ServiceProvider.js";
 import asyncHandler from "express-async-handler";
 import { getSurgeMultiplier } from "../utils/surgeUtils.js";
+import APIFeatures from "../utils/apiFeatures.js";
+import logAction from "../utils/auditLogger.js";
 
 // Haversine distance calculation (in km)
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -23,9 +25,18 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 // @route   GET /api/services
 // @access  Public
 const getServices = asyncHandler(async (req, res) => {
-  const { category, search, city, lat, lng } = req.query;
+  const { category, search, city, lat, lng, minPrice, maxPrice, rating } = req.query;
 
   const query = {};
+  
+  // Only filter by approved/active for public/non-admin users
+  // If we can't determine admin status (e.g. no token in public routes), we default to safe (approved only)
+  // However, we check if the user is NOT an admin to apply the filter.
+  if (!req.user || req.user.role !== "admin") {
+    query.moderationStatus = "approved";
+    query.isActive = true;
+  }
+
   if (category) query.category = category;
   if (search) {
     query.$or = [
@@ -34,15 +45,36 @@ const getServices = asyncHandler(async (req, res) => {
     ];
   }
 
-  // We no longer strictly filter by city, instead we use it for sorting priority
-  let services = await Service.find(query)
-    .populate("provider", "businessName rating numReviews user location")
-    .populate("category", "name icon");
+  // Price Filtering
+  if (minPrice || maxPrice) {
+    query.price = {};
+    if (minPrice) query.price.$gte = Number(minPrice);
+    if (maxPrice) query.price.$lte = Number(maxPrice);
+  }
+
+  // City Filtering logic: Removed strict filtering to allow all services to be visible.
+  // We will instead use the city for sorting and surge multipliers later.
+
+  // Rating Filtering (on provider)
+  // Note: This requires a bit more complex query if we want to filter by populated fields.
+  // For simplicity, we'll filter services, but advanced filtering usually needs aggregation.
+
+  const totalServices = await Service.countDocuments(query);
+  const features = new APIFeatures(
+    Service.find(query)
+      .populate("provider", "businessName rating numReviews user location")
+      .populate("category", "name icon"),
+    req.query,
+  )
+    .sort()
+    .paginate();
+
+  let services = await features.query;
 
   // 1. Distance Calculation & Sorting (if lat/lng provided)
-  if (req.query.lat && req.query.lng) {
-    const userLat = parseFloat(req.query.lat);
-    const userLng = parseFloat(req.query.lng);
+  if (lat && lng) {
+    const userLat = parseFloat(lat);
+    const userLng = parseFloat(lng);
 
     services = services.map((service) => {
       let distance = Infinity;
@@ -56,17 +88,19 @@ const getServices = asyncHandler(async (req, res) => {
       };
     });
 
-    // Sort by distance (nearest first, nulls at the end)
-    services.sort((a, b) => {
-      const distA = a.distance !== null ? a.distance : Infinity;
-      const distB = b.distance !== null ? b.distance : Infinity;
-      return distA - distB;
-    });
+    // Sort by distance (only if not already sorted by another field)
+    if (!req.query.sort) {
+      services.sort((a, b) => {
+        const distA = a.distance !== null ? a.distance : Infinity;
+        const distB = b.distance !== null ? b.distance : Infinity;
+        return distA - distB;
+      });
+    }
   }
 
-  // 2. City Priority Sorting: Services operating in the requested city come first (overrides distance priority)
-  if (req.query.city) {
-    const targetCity = req.query.city.toLowerCase();
+  // 2. City Priority Sorting
+  if (city) {
+    const targetCity = city.toLowerCase();
     services.sort((a, b) => {
       const aHasCity =
         a.cities && Array.isArray(a.cities) && a.cities.some((c) => c.toLowerCase() === targetCity);
@@ -74,20 +108,16 @@ const getServices = asyncHandler(async (req, res) => {
         b.cities && Array.isArray(b.cities) && b.cities.some((c) => c.toLowerCase() === targetCity);
       if (aHasCity && !bHasCity) return -1;
       if (!aHasCity && bHasCity) return 1;
-      return 0; // maintain relative order (which is now distance order) otherwise
+      return 0;
     });
   }
 
-  // 3. Apply surge multiplier if city is provided
-  if (req.query.city) {
+  // 3. Apply surge multiplier
+  if (city) {
     services = await Promise.all(
       services.map(async (s) => {
-        // Check if it's already unwrapped by the map above
         const doc = s._doc ? s._doc : s;
-        const surge = await getSurgeMultiplier(
-          req.query.city,
-          doc.category?._id,
-        );
+        const surge = await getSurgeMultiplier(city, doc.category?._id);
         return {
           ...doc,
           price: Math.round(doc.price * surge.multiplier),
@@ -98,7 +128,12 @@ const getServices = asyncHandler(async (req, res) => {
     );
   }
 
-  res.status(200).json(services);
+  res.status(200).json({
+    services,
+    page: req.query.page * 1 || 1,
+    pages: Math.ceil(totalServices / (req.query.limit * 1 || 10)),
+    total: totalServices,
+  });
 });
 
 // @desc    Fetch single service
@@ -186,6 +221,16 @@ const createService = asyncHandler(async (req, res) => {
   });
 
   const createdService = await service.save();
+
+  // Log creation action
+  await logAction(
+    req,
+    "CREATE_SERVICE",
+    createdService._id,
+    "Service",
+    `Service "${createdService.title}" was created.`
+  );
+
   res.status(201).json(createdService);
 });
 
@@ -205,6 +250,16 @@ const deleteService = asyncHandler(async (req, res) => {
       throw new Error("Not authorized to delete this service");
     }
     await service.deleteOne();
+    
+    // Log deletion
+    await logAction(
+      req,
+      "DELETE_SERVICE",
+      service._id,
+      "Service",
+      `Service "${service.title}" was deleted.`,
+    );
+    
     res.json({ message: "Service removed" });
   } else {
     res.status(404);
@@ -284,14 +339,30 @@ const updateService = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 const moderateService = asyncHandler(async (req, res) => {
   const { moderationStatus, isActive } = req.body;
-  const service = await Service.findById(req.params.id);
+  console.log(`🛡️ [MODERATION] Updating service ${req.params.id} to:`, { moderationStatus, isActive });
+  
+  const updateData = {};
+  if (moderationStatus) updateData.moderationStatus = moderationStatus;
+  if (isActive !== undefined) updateData.isActive = isActive;
+
+  const service = await Service.findByIdAndUpdate(
+    req.params.id,
+    { $set: updateData },
+    { new: true, runValidators: false } // Validation bypassed for direct state update to prevent save failure
+  ).populate("provider category");
 
   if (service) {
-    if (moderationStatus) service.moderationStatus = moderationStatus;
-    if (isActive !== undefined) service.isActive = isActive;
-
-    const updatedService = await service.save();
-    res.json(updatedService);
+    // Log moderation action
+    await logAction(
+      req,
+      "MODERATE_SERVICE",
+      service._id,
+      "Service",
+      `${req.user.name} changed status of "${service.title}" to ${moderationStatus}.`
+    );
+    
+    console.log(`✅ [MODERATION] Successfully updated service:`, service.moderationStatus);
+    res.json(service);
   } else {
     res.status(404);
     throw new Error("Service not found");

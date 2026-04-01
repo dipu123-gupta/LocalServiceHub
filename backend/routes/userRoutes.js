@@ -7,6 +7,7 @@ import {
   getFavorites,
   toggleBlockUser,
   getReferralStats,
+  getAuditLogs,
 } from "../controllers/userController.js";
 import { protect, admin } from "../middlewares/authMiddleware.js";
 
@@ -22,6 +23,7 @@ router.get("/referral-stats", getReferralStats);
 
 // Admin only routes
 router.use(admin);
+router.get("/audit-logs", getAuditLogs);
 router.route("/").get(getUsers);
 router.route("/:id").delete(deleteUser);
 router.route("/:id/role").put(updateUserRole);

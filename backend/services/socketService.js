@@ -10,11 +10,11 @@ export const initSocket = (io) => {
       origin: socket.handshake.headers.origin,
       query: socket.handshake.query
     });
-    const userId = socket.handshake.query.userId;
+    const userId = socket.user?.userId;
 
-    if (userId && userId !== "undefined") {
+    if (userId) {
       userSocketMap[userId] = socket.id;
-      console.log(`Socket connected: user ${userId} → socket ${socket.id}`);
+      console.log(`Socket authenticated: user ${userId} → socket ${socket.id}`);
     }
 
     // Emit online users list

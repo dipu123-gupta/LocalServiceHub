@@ -12,6 +12,9 @@ import Setting from "../models/Setting.js";
 import PaymentTransaction from "../models/PaymentTransaction.js";
 import { getSurgeMultiplier } from "../utils/surgeUtils.js";
 import sendEmail from "../utils/sendEmail.js";
+import APIFeatures from "../utils/apiFeatures.js";
+import logAction from "../utils/auditLogger.js";
+import generateInvoice from "../utils/pdfUtils.js";
 
 // @desc    Create new booking
 // @route   POST /api/bookings
@@ -125,8 +128,20 @@ const createBooking = asyncHandler(async (req, res) => {
   try {
     // Atomically increment coupon usage inside the transaction to prevent race conditions
     if (validatedCoupon) {
-      validatedCoupon.usedCount += 1;
-      await validatedCoupon.save({ session });
+      const updatedCoupon = await Coupon.findOneAndUpdate(
+        {
+          _id: validatedCoupon._id,
+          isActive: true,
+          expiryDate: { $gt: new Date() },
+          usedCount: { $lt: validatedCoupon.usageLimit },
+        },
+        { $inc: { usedCount: 1 } },
+        { new: true, session },
+      );
+
+      if (!updatedCoupon) {
+        throw new Error("Coupon usage limit reached or coupon expired");
+      }
     }
 
     if (paymentMethod === "wallet") {
@@ -242,11 +257,24 @@ const createBooking = asyncHandler(async (req, res) => {
 // @route   GET /api/bookings/mybookings
 // @access  Private
 const getMyBookings = asyncHandler(async (req, res) => {
-  const bookings = await Booking.find({ user: req.user._id })
-    .populate("service", "title price images duration")
-    .populate("provider", "businessName")
-    .sort({ createdAt: -1 });
-  res.status(200).json(bookings);
+  const totalBookings = await Booking.countDocuments({ user: req.user._id });
+  const features = new APIFeatures(
+    Booking.find({ user: req.user._id })
+      .populate("service", "title price images duration")
+      .populate("provider", "businessName"),
+    req.query,
+  )
+    .filter()
+    .sort()
+    .paginate();
+
+  const bookings = await features.query;
+  res.status(200).json({
+    bookings,
+    page: req.query.page * 1 || 1,
+    pages: Math.ceil(totalBookings / (req.query.limit * 1 || 10)),
+    total: totalBookings,
+  });
 });
 
 // @desc    Get provider's bookings (for provider dashboard)
@@ -262,11 +290,24 @@ const getProviderBookings = asyncHandler(async (req, res) => {
     );
   }
 
-  const bookings = await Booking.find({ provider: provider._id })
-    .populate("service", "title price images")
-    .populate("user", "name email phone")
-    .sort({ createdAt: -1 });
-  res.status(200).json(bookings);
+  const totalBookings = await Booking.countDocuments({ provider: provider._id });
+  const features = new APIFeatures(
+    Booking.find({ provider: provider._id })
+      .populate("service", "title price images")
+      .populate("user", "name email phone"),
+    req.query,
+  )
+    .filter()
+    .sort()
+    .paginate();
+
+  const bookings = await features.query;
+  res.status(200).json({
+    bookings,
+    page: req.query.page * 1 || 1,
+    pages: Math.ceil(totalBookings / (req.query.limit * 1 || 10)),
+    total: totalBookings,
+  });
 });
 
 // @desc    Get booking by ID
@@ -700,12 +741,25 @@ const getAdminStats = asyncHandler(async (req, res) => {
 // @route   GET /api/bookings
 // @access  Private/Admin
 const getAllBookings = asyncHandler(async (req, res) => {
-  const bookings = await Booking.find({})
-    .populate("user", "name email phone")
-    .populate("service", "title price")
-    .populate("provider", "businessName")
-    .sort({ createdAt: -1 });
-  res.status(200).json(bookings);
+  const totalBookings = await Booking.countDocuments();
+  const features = new APIFeatures(
+    Booking.find({})
+      .populate("user", "name email phone")
+      .populate("service", "title price")
+      .populate("provider", "businessName"),
+    req.query,
+  )
+    .filter()
+    .sort()
+    .paginate();
+
+  const bookings = await features.query;
+  res.status(200).json({
+    bookings,
+    page: req.query.page * 1 || 1,
+    pages: Math.ceil(totalBookings / (req.query.limit * 1 || 10)),
+    total: totalBookings,
+  });
 });
 
 // @desc    Cancel booking
@@ -753,7 +807,8 @@ const cancelBooking = asyncHandler(async (req, res) => {
         await Transaction.create(
           [
             {
-              user: req.user._id,
+              // Ledger must credit the booking owner (money is refunded to their wallet)
+              user: booking.user,
               amount: booking.totalAmount,
               type: "credit",
               description: `Refund for cancelled booking #${booking._id.toString().slice(-8).toUpperCase()}`,
@@ -770,6 +825,15 @@ const cancelBooking = asyncHandler(async (req, res) => {
     await booking.save({ session });
     await session.commitTransaction();
     session.endSession();
+
+    // Log the cancellation
+    await logAction(
+      req,
+      "CANCEL_BOOKING",
+      booking._id,
+      "Booking",
+      `Booking #${booking._id.toString().slice(-8).toUpperCase()} was cancelled.`,
+    );
 
     // Notifications
     const io = req.app.get("io");
@@ -946,6 +1010,39 @@ const approveAdditionalCharge = asyncHandler(async (req, res) => {
   res.status(200).json(booking);
 });
 
+// @desc    Download booking invoice (PDF)
+// @route   GET /api/bookings/:id/invoice
+// @access  Private
+const downloadInvoice = asyncHandler(async (req, res) => {
+  const booking = await Booking.findById(req.params.id)
+    .populate("user", "name email")
+    .populate("service", "title price")
+    .populate("provider", "businessName email");
+
+  if (!booking) {
+    res.status(404);
+    throw new Error("Booking not found");
+  }
+
+  // Auth check
+  const isOwner = booking.user?._id.toString() === req.user._id.toString();
+  const isAdmin = req.user.role === "admin";
+
+  if (!isOwner && !isAdmin) {
+    res.status(401);
+    throw new Error("Not authorized to download this invoice");
+  }
+
+  // Set response headers for PDF download
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=invoice-${booking._id}.pdf`
+  );
+
+  generateInvoice(booking, res);
+});
+
 export {
   createBooking,
   getMyBookings,
@@ -958,4 +1055,5 @@ export {
   getPaymentTransactions,
   addAdditionalCharge,
   approveAdditionalCharge,
+  downloadInvoice,
 };

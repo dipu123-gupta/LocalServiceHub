@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+import jwt from "jsonwebtoken";
 
 import express from "express";
 import { createServer } from "http";
@@ -33,6 +34,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 import announcementRoutes from "./routes/announcementRoutes.js";
 import settingRoutes from "./routes/settingRoutes.js";
+import supportRoutes from "./routes/supportRoutes.js";
 
 //
 
@@ -66,6 +68,30 @@ const io = new Server(httpServer, {
 // Attach io to app so controllers can emit events
 app.set("io", io);
 
+// Socket.io Authentication Middleware
+io.use((socket, next) => {
+  try {
+    const cookieHeader = socket.handshake.headers.cookie || "";
+    const cookies = Object.fromEntries(
+      cookieHeader.split("; ").map((c) => {
+        const [key, ...v] = c.split("=");
+        return [key, v.join("=")];
+      }),
+    );
+    const token = cookies.token;
+
+    if (!token) {
+      return next(new Error("Authentication error: No token provided"));
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.user = decoded; // Attach user info to socket
+    next();
+  } catch (err) {
+    next(new Error("Authentication error: Invalid token"));
+  }
+});
+
 // Init socket handlers
 initSocket(io);
 
@@ -97,8 +123,8 @@ app.use(
         scriptSrc: ["'self'", "'unsafe-inline'", "https://checkout.razorpay.com", "https://apis.google.com"],
         connectSrc: [
           "'self'",
-          "http://localhost:5000",
-          "ws://localhost:5000",
+          process.env.BACKEND_URL || "http://localhost:5000",
+          process.env.BACKEND_WS_URL || "ws://localhost:5000",
           "http://127.0.0.1:5000",
           "ws://127.0.0.1:5000",
           "https://firebaseinstallations.googleapis.com",
@@ -122,7 +148,6 @@ app.use(hpp()); // Prevent HTTP Parameter Pollution
 
 // Rate Limiting
 app.use("/api", apiLimiter); // Apply general API limits
-app.use("/api/auth", authLimiter); // Stricter limits for auth (Login/Register)
 
 // Diagnostic Middleware (development only — Morgan handles production logging)
 if (process.env.NODE_ENV !== "production") {
@@ -155,6 +180,7 @@ app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/announcements", announcementRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/settings", settingRoutes);
+app.use("/api/support", supportRoutes);
 
 app.get("/", (req, res) => {
   res.send("LocalServiceHub API is running...");

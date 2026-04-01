@@ -8,7 +8,12 @@ import {
   moderateService,
   getMyServices,
 } from "../controllers/serviceController.js";
-import { protect, provider, admin } from "../middlewares/authMiddleware.js";
+import { 
+  protect, 
+  provider, 
+  admin, 
+  optionalAuth 
+} from "../middlewares/authMiddleware.js";
 import {
   validateRequest,
   serviceSchema,
@@ -17,7 +22,7 @@ import { upload } from "../config/cloudinary.js";
 
 const router = express.Router();
 
-router.route("/").get(getServices).post(protect, provider, upload.array("images", 5), createService);
+router.route("/").get(optionalAuth, getServices).post(protect, provider, upload.array("images", 5), createService);
 router.route("/my").get(protect, provider, getMyServices);
 router
   .route("/:id")

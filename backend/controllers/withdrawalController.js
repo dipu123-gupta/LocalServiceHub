@@ -3,6 +3,8 @@ import Wallet from "../models/Wallet.js";
 import Transaction from "../models/Transaction.js";
 import asyncHandler from "express-async-handler";
 
+import mongoose from "mongoose";
+
 // @desc    Request a withdrawal (Provider)
 // @route   POST /api/withdrawals
 // @access  Private/Provider
@@ -14,34 +16,56 @@ const requestWithdrawal = asyncHandler(async (req, res) => {
     throw new Error("Minimum withdrawal amount is ₹100");
   }
 
-  const wallet = await Wallet.findOne({ user: req.user._id });
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (!wallet || wallet.withdrawableBalance < amount) {
+  try {
+    const wallet = await Wallet.findOne({ user: req.user._id }).session(session);
+
+    if (!wallet || wallet.withdrawableBalance < amount) {
+      throw new Error("Insufficient withdrawable balance");
+    }
+
+    // Deduct from wallet balances
+    wallet.balance -= amount;
+    wallet.withdrawableBalance -= amount;
+    await wallet.save({ session });
+
+    const [withdrawal] = await Withdrawal.create(
+      [
+        {
+          provider: req.user._id,
+          amount,
+          bankDetails,
+        },
+      ],
+      { session },
+    );
+
+    await Transaction.create(
+      [
+        {
+          user: req.user._id,
+          amount,
+          type: "debit",
+          description: "Withdrawal request (Pending)",
+          status: "pending",
+          withdrawal: withdrawal._id,
+        },
+      ],
+      { session },
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(201).json(withdrawal);
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     res.status(400);
-    throw new Error("Insufficient withdrawable balance");
+    throw error;
   }
-
-  // Deduct from wallet balances
-  wallet.balance -= amount;
-  wallet.withdrawableBalance -= amount;
-  await wallet.save();
-
-  const withdrawal = await Withdrawal.create({
-    provider: req.user._id,
-    amount,
-    bankDetails,
-  });
-
-  await Transaction.create({
-    user: req.user._id,
-    amount,
-    type: "debit",
-    description: "Withdrawal request (Pending)",
-    status: "pending",
-    withdrawal: withdrawal._id,
-  });
-
-  res.status(201).json(withdrawal);
 });
 
 // @desc    Get my withdrawals (Provider)

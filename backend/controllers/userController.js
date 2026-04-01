@@ -1,7 +1,10 @@
 import User from "../models/User.js";
 import Wallet from "../models/Wallet.js";
 import Transaction from "../models/Transaction.js";
+import AuditLog from "../models/AuditLog.js";
 import asyncHandler from "express-async-handler";
+import APIFeatures from "../utils/apiFeatures.js";
+import logAction from "../utils/auditLogger.js";
 
 // @desc    Get all users
 // @route   GET /api/users
@@ -20,8 +23,22 @@ const getUsers = asyncHandler(async (req, res) => {
   if (role) query.role = role;
   if (isBlocked !== undefined) query.isBlocked = isBlocked === "true";
 
-  const users = await User.find(query).select("-password").sort({ createdAt: -1 });
-  res.json(users);
+  const totalUsers = await User.countDocuments(query);
+  const features = new APIFeatures(
+    User.find(query).select("-password"),
+    req.query,
+  )
+    .filter()
+    .sort()
+    .paginate();
+
+  const users = await features.query;
+  res.json({
+    users,
+    page: req.query.page * 1 || 1,
+    pages: Math.ceil(totalUsers / (req.query.limit * 1 || 10)),
+    total: totalUsers,
+  });
 });
 
 // @desc    Delete user
@@ -128,6 +145,15 @@ const toggleBlockUser = asyncHandler(async (req, res) => {
     user.isBlocked = !user.isBlocked;
     await user.save();
 
+    // Log block/unblock action
+    await logAction(
+      req,
+      user.isBlocked ? "BLOCK_USER" : "UNBLOCK_USER",
+      user._id,
+      "User",
+      `User ${user.email} was ${user.isBlocked ? "blocked" : "unblocked"}.`,
+    );
+
     res.json({
       message: `User ${user.isBlocked ? "blocked" : "unblocked"} successfully`,
       isBlocked: user.isBlocked,
@@ -162,6 +188,36 @@ const getReferralStats = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Get all audit logs
+// @route   GET /api/users/audit-logs
+// @access  Private/Admin
+const getAuditLogs = asyncHandler(async (req, res) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
+
+  const totalLogs = await AuditLog.countDocuments();
+  const logsRaw = await AuditLog.find()
+    .populate("user", "name email")
+    .sort("-createdAt")
+    .skip(skip)
+    .limit(limit);
+
+  // Map to match frontend expectations (Renaming internal fields for UI compatibility)
+  const logs = logsRaw.map((log) => ({
+    ...log._doc,
+    admin: log.user, // UI uses .admin.name
+    targetType: log.targetModel, // UI uses .targetType
+  }));
+
+  res.json({
+    logs,
+    page,
+    pages: Math.ceil(totalLogs / limit),
+    total: totalLogs,
+  });
+});
+
 export {
   getUsers,
   deleteUser,
@@ -170,4 +226,5 @@ export {
   getFavorites,
   toggleBlockUser,
   getReferralStats,
+  getAuditLogs,
 };

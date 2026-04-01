@@ -11,6 +11,7 @@ import {
   getPaymentTransactions,
   addAdditionalCharge,
   approveAdditionalCharge,
+  downloadInvoice,
 } from "../controllers/bookingController.js";
 import { protect, provider, admin } from "../middlewares/authMiddleware.js";
 import {
@@ -26,6 +27,7 @@ router
   .post(protect, validateRequest(createBookingSchema), createBooking);
 router.route("/mybookings").get(protect, getMyBookings);
 router.route("/provider").get(protect, provider, getProviderBookings);
+router.route("/:id/invoice").get(protect, downloadInvoice);
 router.route("/admin/stats").get(protect, admin, getAdminStats);
 router.route("/admin/transactions").get(protect, admin, getPaymentTransactions);
 router.route("/:id").get(protect, getBookingById);

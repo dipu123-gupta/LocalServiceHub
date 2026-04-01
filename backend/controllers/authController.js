@@ -2,6 +2,12 @@ import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
 import admin from "firebase-admin";
 import mongoose from "mongoose";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const { authenticator } = require("otplib");
+const qrcode = require("qrcode");
+
+import logAction from "../utils/auditLogger.js";
 import generateToken from "../utils/generateToken.js";
 import sendEmail from "../utils/sendEmail.js";
 import Wallet from "../models/Wallet.js";
@@ -9,6 +15,8 @@ import User from "../models/User.js";
 import Transaction from "../models/Transaction.js";
 import SubscriptionPlan from "../models/SubscriptionPlan.js";
 import asyncHandler from "express-async-handler";
+
+const QRCode = qrcode.default || qrcode;
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -23,7 +31,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("User already exists");
   }
 
-  // Handle referral
+  // Handle referral - checking existence of referrer early
   let referredBy = null;
   if (referralCode) {
     const referrer = await User.findOne({ referralCode });
@@ -32,48 +40,72 @@ const registerUser = asyncHandler(async (req, res) => {
     }
   }
 
-  const user = await User.create({
-    name,
-    email,
-    password,
-    role: role || "user",
-    referredBy,
-  });
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (user) {
+  try {
+    const [user] = await User.create(
+      [
+        {
+          name,
+          email,
+          password,
+          role: role || "user",
+          referredBy,
+        },
+      ],
+      { session },
+    );
+
     // Create wallet for new user
-    const wallet = await Wallet.create({ user: user._id });
+    const [wallet] = await Wallet.create([{ user: user._id }], { session });
 
     // If referred, award bonuses
     if (referredBy) {
       // New user bonus (₹50)
       wallet.balance += 50;
-      await wallet.save();
-      await Transaction.create({
-        user: user._id,
-        amount: 50,
-        type: "credit",
-        description: "Referral signup bonus",
-      });
+      await wallet.save({ session });
+      await Transaction.create(
+        [
+          {
+            user: user._id,
+            amount: 50,
+            type: "credit",
+            description: "Referral signup bonus",
+          },
+        ],
+        { session },
+      );
 
       // Referrer bonus (₹100)
-      const referrerWallet = await Wallet.findOne({ user: referredBy });
+      const referrerWallet = await Wallet.findOne({ user: referredBy }).session(
+        session,
+      );
       if (referrerWallet) {
         referrerWallet.balance += 100;
-        await referrerWallet.save();
-        await Transaction.create({
-          user: referredBy,
-          amount: 100,
-          type: "credit",
-          description: `Bonus for referring ${user.name}`,
-        });
+        await referrerWallet.save({ session });
+        await Transaction.create(
+          [
+            {
+              user: referredBy,
+              amount: 100,
+              type: "credit",
+              description: `Bonus for referring ${user.name}`,
+            },
+          ],
+          { session },
+        );
       }
     }
 
     // --- Email Verification Implementation ---
     const verificationToken = user.getEmailVerificationToken();
-    await user.save({ validateBeforeSave: false });
+    await user.save({ session, validateBeforeSave: false });
 
+    await session.commitTransaction();
+    session.endSession();
+
+    // Post-Transaction: Non-blocking Email
     const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
     const message = `Welcome to LocalServiceHub! Please verify your email by clicking the link below:\n\n${verificationUrl}`;
 
@@ -85,8 +117,6 @@ const registerUser = asyncHandler(async (req, res) => {
       });
     } catch (err) {
       console.error("Email Verification Error:", err);
-      // We don't throw error here to allow registration to complete,
-      // but the user won't be verified.
     }
 
     generateToken(res, user._id);
@@ -99,9 +129,11 @@ const registerUser = asyncHandler(async (req, res) => {
       profileImage: user.profileImage,
       activeSubscription: user.activeSubscription,
     });
-  } else {
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     res.status(400);
-    throw new Error("Invalid user data");
+    throw error;
   }
 });
 
@@ -133,7 +165,18 @@ const loginUser = asyncHandler(async (req, res) => {
       throw new Error("Your account has been blocked. Please contact support.");
     }
 
+    // Check if MFA is enabled
+    if (user.isTwoFactorEnabled) {
+      return res.status(200).json({
+        mfaRequired: true,
+        userId: user._id,
+        email: user.email,
+        message: "MFA code required to complete login",
+      });
+    }
+
     generateToken(res, user._id);
+    await logAction(req, "LOGIN", user._id, "User", "User logged in successfully (Standard)");
 
     const populatedUser = await User.findById(user._id).populate(
       "activeSubscription",
@@ -285,7 +328,8 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   user.name = req.body.name || user.name;
   user.phone = req.body.phone || user.phone;
   if (req.body.address) user.address = req.body.address;
-  if (req.body.password) user.password = req.body.password;
+  // SECURITY: Remote password update from profile edit. 
+  // Password updates MUST use the /update-password route which requires currentPassword.
 
   if (req.file) {
     user.profileImage = req.file.path;
@@ -485,6 +529,112 @@ const googleAuth = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Setup MFA
+// @route   POST /api/auth/mfa/setup
+// @access  Private
+const setupMFA = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  if (user.isTwoFactorEnabled) {
+    res.status(400);
+    throw new Error("MFA is already enabled");
+  }
+
+  const secret = authenticator.generateSecret();
+  const otpauthUrl = authenticator.keyuri(user.email, "HomeServiceHub", secret);
+  const qrCodeDataUrl = await QRCode.toDataURL(otpauthUrl);
+
+  user.twoFactorSecret = secret;
+  await user.save();
+
+  res.status(200).json({
+    secret,
+    qrCode: qrCodeDataUrl,
+  });
+});
+
+// @desc    Verify MFA and Enable
+// @route   POST /api/auth/mfa/verify
+// @access  Private
+const verifyAndEnableMFA = asyncHandler(async (req, res) => {
+  const { token } = req.body;
+  const user = await User.findById(req.user._id).select("+twoFactorSecret");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const isValid = authenticator.verify({
+    token,
+    secret: user.twoFactorSecret,
+  });
+
+  if (!isValid) {
+    res.status(400);
+    throw new Error("Invalid MFA token");
+  }
+
+  user.isTwoFactorEnabled = true;
+  await user.save();
+
+  await logAction(req, "MFA_ENABLED", user._id, "User", "MFA was enabled by the user.");
+
+  res.status(200).json({
+    success: true,
+    message: "MFA enabled successfully",
+  });
+});
+
+// @desc    Validate MFA for Login
+// @route   POST /api/auth/mfa/login-verify
+// @access  Public
+const loginVerifyMFA = asyncHandler(async (req, res) => {
+  const { userId, token } = req.body;
+
+  const user = await User.findById(userId).select("+twoFactorSecret");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  if (!user.isTwoFactorEnabled) {
+    res.status(400);
+    throw new Error("MFA is not enabled for this user");
+  }
+
+  const isValid = authenticator.verify({
+    token,
+    secret: user.twoFactorSecret,
+  });
+
+  if (!isValid) {
+    res.status(400);
+    throw new Error("Invalid MFA token");
+  }
+
+  generateToken(res, user._id);
+  await logAction(req, "LOGIN", user._id, "User", "User logged in successfully (MFA Verified)");
+
+  const populatedUser = await User.findById(user._id).populate("activeSubscription");
+
+  res.status(200).json({
+    _id: populatedUser._id,
+    name: populatedUser.name,
+    email: populatedUser.email,
+    role: populatedUser.role,
+    profileImage: populatedUser.profileImage,
+    activeSubscription: populatedUser.activeSubscription,
+    isEmailVerified: populatedUser.isEmailVerified,
+  });
+});
+
 export {
   registerUser,
   loginUser,
@@ -496,4 +646,7 @@ export {
   verifyEmail,
   updatePassword,
   googleAuth,
+  setupMFA,
+  verifyAndEnableMFA,
+  loginVerifyMFA,
 };

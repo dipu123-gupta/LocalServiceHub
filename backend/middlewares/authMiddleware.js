@@ -49,4 +49,23 @@ const provider = (req, res, next) => {
   }
 };
 
-export { protect, admin, provider };
+const optionalAuth = async (req, res, next) => {
+  let token = req.cookies.token;
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.userId).select("-password");
+
+      if (user && !user.isBlocked) {
+        req.user = user;
+      }
+    } catch (error) {
+      // Ignore errors for optional auth
+      console.log("Optional Auth: Token invalid or expired");
+    }
+  }
+  next();
+};
+
+export { protect, admin, provider, optionalAuth };
