@@ -14,6 +14,8 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [referralCode, setReferralCode] = useState("");
+  const [showOTP, setShowOTP] = useState(false);
+  const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -64,13 +66,37 @@ const Register = () => {
         password,
         referralCode,
       });
+      if (data.requiresOTP) {
+        setShowOTP(true);
+        setError(""); 
+      } else {
+        dispatch(setCredentials(data));
+        navigate("/");
+      }
+    } catch (err) {
+      setError(
+        err.extractedMessage ||
+          err.message ||
+          "Registration failed. Please try again.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const otpSubmitHandler = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    try {
+      const data = await authService.verifyOTP({ email, otp });
       dispatch(setCredentials(data));
       navigate("/");
     } catch (err) {
       setError(
         err.extractedMessage ||
           err.message ||
-          "Registration failed. Please try again.",
+          "OTP Verification failed. Please try again.",
       );
     } finally {
       setIsLoading(false);
@@ -154,6 +180,57 @@ const Register = () => {
             </motion.div>
           )}
 
+          {showOTP ? (
+            <form onSubmit={otpSubmitHandler} className="flex flex-col gap-8">
+               <div className="text-center mb-2">
+                 <h2 className="text-2xl font-black text-white">Enter Verification Code</h2>
+                 <p className="text-slate-400 text-sm mt-2">We sent a 6-digit code to <span className="font-bold text-indigo-400">{email}</span></p>
+               </div>
+               
+               <div className="group">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block ml-1">6-Digit OTP</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-600 group-focus-within:text-indigo-400 transition-colors">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="123456"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    required
+                    maxLength={6}
+                    className="w-full bg-white/[0.03] border border-white/10 text-white rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-indigo-500/50 focus:bg-white/[0.06] transition-all font-bold placeholder:text-slate-700 text-lg tracking-widest text-center"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-16 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-indigo-600/20"
+              >
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    Verify & Login
+                    <ArrowRight size={18} />
+                  </>
+                )}
+              </button>
+              
+              <button 
+                type="button"
+                onClick={() => setShowOTP(false)}
+                className="text-xs font-bold text-slate-500 hover:text-white transition-colors mt-2"
+                disabled={isLoading}
+              >
+                Change Email Address
+              </button>
+            </form>
+          ) : (
+          <div className="flex flex-col w-full">
           <form onSubmit={submitHandler} className="flex flex-col gap-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="group">
@@ -284,6 +361,8 @@ const Register = () => {
               Google
             </button>
           </div>
+          </div>
+          )}
 
           <div className="mt-10 pt-10 border-t border-white/5 flex flex-wrap justify-center gap-6">
             <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-600">

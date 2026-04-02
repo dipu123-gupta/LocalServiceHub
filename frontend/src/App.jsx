@@ -7,61 +7,70 @@ import IncomingCallModal from "./components/IncomingCallModal";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
 
-import Home from "./pages/Home";
-import EmailVerification from "./pages/EmailVerification";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Services from "./pages/Services";
-import ServiceDetail from "./pages/ServiceDetail";
-import Dashboard from "./pages/Dashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import PaymentPage from "./pages/PaymentPage";
-import SubscriptionPage from "./pages/SubscriptionPage";
-import SubscriptionCheckoutPage from "./pages/SubscriptionCheckoutPage";
+import { lazy, Suspense } from "react";
+
+const Home = lazy(() => import("./pages/Home"));
+const EmailVerification = lazy(() => import("./pages/EmailVerification"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Services = lazy(() => import("./pages/Services"));
+const ServiceDetail = lazy(() => import("./pages/ServiceDetail"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const PaymentPage = lazy(() => import("./pages/PaymentPage"));
+const SubscriptionPage = lazy(() => import("./pages/SubscriptionPage"));
+const SubscriptionCheckoutPage = lazy(() => import("./pages/SubscriptionCheckoutPage"));
 import usePushNotifications from "./hooks/usePushNotifications";
 
 // Provider Pages (New Rebuild)
 import ProviderLayout from "./components/provider/ProviderLayout";
-import NewProviderDashboard from "./pages/provider/Dashboard";
-import ProviderServices from "./pages/provider/Services";
-import ProviderBookings from "./pages/provider/Bookings";
-import ProviderEarnings from "./pages/provider/Earnings";
-import ProviderProfile from "./pages/provider/Profile";
-import ProviderReviews from "./pages/provider/Reviews";
-import ProviderMessages from "./pages/provider/Messages";
-import ProviderMembership from "./pages/provider/Membership";
-import ProviderSafety from "./pages/provider/Safety";
-import ProviderSlotManager from "./pages/provider/SlotManager";
-import ProviderSupport from "./pages/provider/Support";
+const NewProviderDashboard = lazy(() => import("./pages/provider/Dashboard"));
+const ProviderServices = lazy(() => import("./pages/provider/Services"));
+const ProviderBookings = lazy(() => import("./pages/provider/Bookings"));
+const ProviderEarnings = lazy(() => import("./pages/provider/Earnings"));
+const ProviderProfile = lazy(() => import("./pages/provider/Profile"));
+const ProviderReviews = lazy(() => import("./pages/provider/Reviews"));
+const ProviderMessages = lazy(() => import("./pages/provider/Messages"));
+const ProviderMembership = lazy(() => import("./pages/provider/Membership"));
+const ProviderSafety = lazy(() => import("./pages/provider/Safety"));
+const ProviderSlotManager = lazy(() => import("./pages/provider/SlotManager"));
+const ProviderSupport = lazy(() => import("./pages/provider/Support"));
 
 // New Pages
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Categories from "./pages/Categories";
-import Wallet from "./pages/Wallet";
-import Notifications from "./pages/Notifications";
-import Careers from "./pages/Careers";
-import Blog from "./pages/Blog";
-import Press from "./pages/Press";
-import HowItWorks from "./pages/HowItWorks";
-import HelpCenter from "./pages/HelpCenter";
-import Safety from "./pages/Safety";
-import Support from "./pages/Support";
-import BecomeProvider from "./pages/BecomeProvider";
-import ProviderResources from "./pages/ProviderResources";
-import PartnerWithUs from "./pages/PartnerWithUs";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import RefundPolicy from "./pages/RefundPolicy";
-import CancellationPolicy from "./pages/CancellationPolicy";
-import CityPage from "./pages/CityPage";
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Categories = lazy(() => import("./pages/Categories"));
+const Wallet = lazy(() => import("./pages/Wallet"));
+const Notifications = lazy(() => import("./pages/Notifications"));
+const Careers = lazy(() => import("./pages/Careers"));
+const Blog = lazy(() => import("./pages/Blog"));
+const Press = lazy(() => import("./pages/Press"));
+const HowItWorks = lazy(() => import("./pages/HowItWorks"));
+const HelpCenter = lazy(() => import("./pages/HelpCenter"));
+const Safety = lazy(() => import("./pages/Safety"));
+const Support = lazy(() => import("./pages/Support"));
+const BecomeProvider = lazy(() => import("./pages/BecomeProvider"));
+const ProviderResources = lazy(() => import("./pages/ProviderResources"));
+const PartnerWithUs = lazy(() => import("./pages/PartnerWithUs"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
+const CancellationPolicy = lazy(() => import("./pages/CancellationPolicy"));
+const CityPage = lazy(() => import("./pages/CityPage"));
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "./store/authSlice";
 import { authService } from "./services/authService";
+
+
+const SuspenseFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-[#0A0C10]">
+    <div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+  </div>
+);
 
 function App() {
   const dispatch = useDispatch();
@@ -101,6 +110,7 @@ function App() {
       <IncomingCallModal />
       <main className="min-h-screen">
         <ErrorBoundary>
+          <Suspense fallback={<SuspenseFallback />}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -189,6 +199,7 @@ function App() {
             />
             <Route path="/city/:cityName" element={<CityPage />} />
           </Routes>
+          </Suspense>
         </ErrorBoundary>
       </main>
       <Footer />

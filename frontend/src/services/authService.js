@@ -11,6 +11,11 @@ export const authService = {
     return response.data;
   },
 
+  verifyOTP: async (data) => {
+    const response = await api.post("/auth/verify-otp", data);
+    return response.data;
+  },
+
   logout: async () => {
     const response = await api.post("/auth/logout");
     return response.data;
