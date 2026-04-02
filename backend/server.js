@@ -9,6 +9,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import compression from "compression";
 import connectDB from "./config/db.js";
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 import { initSocket } from "./services/socketService.js";
@@ -96,6 +97,7 @@ io.use((socket, next) => {
 initSocket(io);
 
 // Middlewares
+app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(

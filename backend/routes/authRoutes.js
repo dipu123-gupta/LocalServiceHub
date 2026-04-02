@@ -8,6 +8,7 @@ import {
   forgotPassword,
   resetPassword,
   verifyEmail,
+  verifyEmailOTP,
   updatePassword,
   googleAuth,
   setupMFA,
@@ -32,6 +33,7 @@ router.post("/logout", logoutUser);
 router.post("/forgot-password", authLimiter, forgotPassword);
 router.put("/reset-password/:token", authLimiter, resetPassword);
 router.get("/verify-email/:token", verifyEmail);
+router.post("/verify-otp", authLimiter, verifyEmailOTP);
 router.put("/update-password", protect, updatePassword);
 router
   .route("/profile")

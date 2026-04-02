@@ -86,8 +86,9 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    emailVerificationToken: String,
     emailVerificationExpire: Date,
+    emailOtp: String,
+    emailOtpExpire: Date,
     fcmTokens: {
       type: [String],
       default: [],

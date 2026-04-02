@@ -3,7 +3,7 @@ import AuditLog from "../models/AuditLog.js";
 const logAction = async (req, action, targetId, targetModel, details) => {
   try {
     await AuditLog.create({
-      user: req.user._id,
+      user: req.user ? req.user._id : targetId,
       action,
       targetId,
       targetModel,

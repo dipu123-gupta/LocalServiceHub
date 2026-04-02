@@ -2,10 +2,13 @@ import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
 import admin from "firebase-admin";
 import mongoose from "mongoose";
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const { authenticator } = require("otplib");
-const qrcode = require("qrcode");
+import * as otplib from "otplib";
+const { authenticator } = otplib;
+import qrcode from "qrcode";
+import dns from "dns";
+import { promisify } from "util";
+
+const resolveMx = promisify(dns.resolveMx);
 
 import logAction from "../utils/auditLogger.js";
 import generateToken from "../utils/generateToken.js";
@@ -27,8 +30,39 @@ const registerUser = asyncHandler(async (req, res) => {
   const userExists = await User.findOne({ email });
 
   if (userExists) {
+    if (!userExists.isEmailVerified) {
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      userExists.emailOtp = crypto.createHash("sha256").update(otp).digest("hex");
+      userExists.emailOtpExpire = Date.now() + 10 * 60 * 1000;
+      await userExists.save();
+      
+      const message = `Your new verification OTP is: ${otp}\nIt is valid for 10 minutes.`;
+      try {
+        await sendEmail({
+          email: userExists.email,
+          subject: "Email Verification OTP",
+          message,
+        });
+      } catch (err) {
+        console.error("Email Verification Error:", err);
+      }
+      return res.status(200).json({ requiresOTP: true, email: userExists.email, message: "OTP resent to your email" });
+    }
     res.status(400);
     throw new Error("User already exists");
+  }
+
+  // Ensure the email domain is valid and can receive emails
+  const domain = email.split("@")[1];
+  try {
+    const mxRecords = await resolveMx(domain);
+    if (!mxRecords || mxRecords.length === 0) {
+      res.status(400);
+      throw new Error("Please enter your valid email id");
+    }
+  } catch (error) {
+    res.status(400);
+    throw new Error("Please enter your valid email id");
   }
 
   // Handle referral - checking existence of referrer early
@@ -99,35 +133,32 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     // --- Email Verification Implementation ---
-    const verificationToken = user.getEmailVerificationToken();
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.emailOtp = crypto.createHash("sha256").update(otp).digest("hex");
+    user.emailOtpExpire = Date.now() + 10 * 60 * 1000;
+    
     await user.save({ session, validateBeforeSave: false });
 
     await session.commitTransaction();
     session.endSession();
 
     // Post-Transaction: Non-blocking Email
-    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
-    const message = `Welcome to LocalServiceHub! Please verify your email by clicking the link below:\n\n${verificationUrl}`;
+    const message = `Welcome to LocalServiceHub! Your email verification OTP is: ${otp}. It is valid for 10 minutes.`;
 
     try {
       await sendEmail({
         email: user.email,
-        subject: "Email Verification",
+        subject: "Email Verification OTP",
         message,
       });
     } catch (err) {
       console.error("Email Verification Error:", err);
     }
 
-    generateToken(res, user._id);
-
     res.status(201).json({
-      _id: user._id,
-      name: user.name,
+      requiresOTP: true,
       email: user.email,
-      role: user.role,
-      profileImage: user.profileImage,
-      activeSubscription: user.activeSubscription,
+      message: "Please verify your email using the OTP sent.",
     });
   } catch (error) {
     await session.abortTransaction();
@@ -635,6 +666,51 @@ const loginVerifyMFA = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Verify Email OTP
+// @route   POST /api/auth/verify-otp
+// @access  Public
+const verifyEmailOTP = asyncHandler(async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    res.status(400);
+    throw new Error("Please provide email and OTP");
+  }
+
+  const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
+
+  const user = await User.findOne({
+    email,
+    emailOtp: hashedOtp,
+    emailOtpExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    res.status(400);
+    throw new Error("Invalid or expired OTP");
+  }
+
+  user.isEmailVerified = true;
+  user.emailOtp = undefined;
+  user.emailOtpExpire = undefined;
+  await user.save();
+
+  generateToken(res, user._id);
+  await logAction(req, "REGISTER_VERIFY", user._id, "User", "User registered and verified OTP");
+
+  const populatedUser = await User.findById(user._id).populate("activeSubscription");
+
+  res.status(200).json({
+    _id: populatedUser._id,
+    name: populatedUser.name,
+    email: populatedUser.email,
+    role: populatedUser.role,
+    profileImage: populatedUser.profileImage,
+    activeSubscription: populatedUser.activeSubscription,
+    isEmailVerified: true,
+  });
+});
+
 export {
   registerUser,
   loginUser,
@@ -644,6 +720,7 @@ export {
   forgotPassword,
   resetPassword,
   verifyEmail,
+  verifyEmailOTP,
   updatePassword,
   googleAuth,
   setupMFA,

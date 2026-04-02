@@ -86,6 +86,7 @@ const serviceSchema = new mongoose.Schema(
 
 serviceSchema.index({ category: 1 });
 serviceSchema.index({ provider: 1 });
+serviceSchema.index({ isActive: 1, moderationStatus: 1 });
 serviceSchema.index({ title: "text", description: "text" });
 
 const Service = mongoose.model("Service", serviceSchema);

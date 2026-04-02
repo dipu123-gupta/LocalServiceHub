@@ -13,7 +13,7 @@ const sendEmail = async (options) => {
 
   // Define the email options
   const message = {
-    from: `${process.env.FROM_NAME || "HomeServiceHub"} <${process.env.SMTP_EMAIL}>`,
+    from: `${process.env.FROM_NAME || "HomeServiceHub"} <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_EMAIL}>`,
     to: options.email,
     subject: options.subject,
     text: options.message,
