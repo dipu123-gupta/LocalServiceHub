@@ -45,6 +45,8 @@ const registerUser = asyncHandler(async (req, res) => {
         });
       } catch (err) {
         console.error("Email Verification Error:", err);
+        res.status(500);
+        throw new Error("Render Mail Error: " + err.message);
       }
       return res.status(200).json({ requiresOTP: true, email: userExists.email, message: "OTP resent to your email" });
     }
@@ -153,6 +155,11 @@ const registerUser = asyncHandler(async (req, res) => {
       });
     } catch (err) {
       console.error("Email Verification Error:", err);
+      // Rollback transaction because email failed
+      await session.abortTransaction();
+      session.endSession();
+      res.status(500);
+      throw new Error("Render Mail Error: " + err.message);
     }
 
     res.status(201).json({
