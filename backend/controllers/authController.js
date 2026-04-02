@@ -290,18 +290,37 @@ const forgotPassword = asyncHandler(async (req, res) => {
   // Create reset url
   const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`;
 
-  const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
+  console.log(`🔑 [ForgotPassword] Reset URL generated: ${resetUrl}`);
+  console.log(`🔑 [ForgotPassword] FRONTEND_URL env: ${process.env.FRONTEND_URL}`);
+
+  const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please click the link below to reset your password:\n\n${resetUrl}\n\nIf you did not request this, please ignore this email.`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h2 style="color: #4F46E5;">Password Reset Request</h2>
+      <p>You are receiving this email because you (or someone else) has requested the reset of your password.</p>
+      <p>Please click the button below to reset your password:</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${resetUrl}" style="background-color: #4F46E5; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+      </div>
+      <p style="color: #666; font-size: 12px;">If the button doesn't work, copy and paste this link in your browser:</p>
+      <p style="color: #4F46E5; font-size: 12px; word-break: break-all;">${resetUrl}</p>
+      <p style="color: #999; font-size: 11px;">This link will expire in 10 minutes. If you did not request a password reset, please ignore this email.</p>
+    </div>
+  `;
 
   try {
     await sendEmail({
       email: user.email,
-      subject: "Password reset token",
+      subject: "Password Reset - HomeServiceHub",
       message,
+      html,
     });
 
     res.status(200).json({ success: true, data: "Email sent" });
   } catch (err) {
-    console.error(err);
+    console.error("❌ [ForgotPassword] Email send FAILED:", err.message);
+    console.error("❌ [ForgotPassword] Full error:", err);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
