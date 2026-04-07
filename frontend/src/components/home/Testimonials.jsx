@@ -45,13 +45,13 @@ const Testimonials = () => {
   };
 
   return (
-    <section className="py-32 px-6 bg-[#0A0C10] relative overflow-hidden">
+    <section className="py-20 px-6 bg-[#0A0C10] relative overflow-hidden">
       {/* Background Meshes */}
        <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none" />
        <div className="absolute bottom-0 left-0 w-[30%] h-[30%] bg-purple-600/10 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center justify-between mb-20 gap-8">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-8">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -61,7 +61,7 @@ const Testimonials = () => {
             <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-950/40 rounded-full border border-indigo-500/20 shadow-[0_0_20px_rgba(79,70,229,0.1)]">
               <Star size={12} className="text-amber-400" /> Community Voice
             </div>
-            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-tight">
+            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
               Loved by <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Happy Customers</span>
             </h2>
           </motion.div>

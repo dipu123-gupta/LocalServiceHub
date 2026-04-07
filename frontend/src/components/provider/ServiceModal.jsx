@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Upload, Plus, Trash2, Loader2, IndianRupee, Clock, ChevronDown, CheckCircle2, AlertCircle } from "lucide-react";
+import { X, Upload, Plus, Trash2, Loader2, IndianRupee, Clock, ChevronDown, CheckCircle2, AlertCircle, Sparkles, MapPin, Tag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "@/utils/api";
 
@@ -109,43 +109,56 @@ const ServiceModal = ({ service, isOpen, onClose, onSuccess }) => {
     }
   };
 
+  /* ---- shared input classes ---- */
+  const inputBase = "w-full bg-slate-50 border border-slate-200 focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 rounded-lg py-2 px-3 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400";
+  const labelBase = "text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1";
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3">
+      {/* Backdrop */}
       <motion.div 
         initial={{ opacity: 0 }} 
         animate={{ opacity: 1 }} 
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
       />
       
+      {/* Modal */}
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl relative z-10 overflow-hidden flex flex-col max-h-[90vh]"
+        className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl relative z-10 overflow-hidden flex flex-col"
       >
-        {/* Header */}
-        <div className="px-10 py-8 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-          <div>
-            <h3 className="text-2xl font-black text-slate-900 tracking-tight">
-              {service ? "Edit Listing" : "New Service"}
-            </h3>
-            <p className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-widest text-[10px]">
-              Fill in the details to publish your service
-            </p>
+        {/* ── Header ── */}
+        <div className="px-6 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+              <Sparkles size={18} className="text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white leading-tight">
+                {service ? "Edit Listing" : "New Service"}
+              </h3>
+              <p className="text-[11px] text-indigo-200">Fill in the details to publish your service</p>
+            </div>
           </div>
-          <button onClick={onClose} className="p-3 bg-white text-slate-400 hover:text-rose-500 rounded-2xl shadow-sm transition-all border border-slate-100">
-            <X size={20} />
+          <button onClick={onClose} className="p-2 bg-white/15 text-white hover:bg-white/30 rounded-lg transition-all">
+            <X size={18} />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-10 custom-scrollbar space-y-8">
-          <form id="serviceForm" onSubmit={handleSubmit} className="space-y-10">
-            {/* Gallery */}
-            <div className="space-y-4">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Service Gallery</label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {/* ── Form Body ── */}
+        <form id="serviceForm" onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
+          
+          {/* ROW 1 — Gallery + Basic Info side by side */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            {/* Gallery — left 2 cols */}
+            <div className="lg:col-span-2">
+              <label className={labelBase}>
+                <span className="flex items-center gap-1"><Upload size={12} className="text-indigo-500" /> Service Photos</span>
+              </label>
+              <div className="flex gap-2 flex-wrap">
                 <AnimatePresence>
                   {previewImages.map((src, idx) => (
                     <motion.div 
@@ -153,182 +166,185 @@ const ServiceModal = ({ service, isOpen, onClose, onSuccess }) => {
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
-                      className="aspect-square rounded-3xl relative group overflow-hidden border-2 border-slate-50"
+                      className="w-16 h-16 rounded-lg relative group overflow-hidden border border-slate-200"
                     >
                       <img src={src} className="w-full h-full object-cover" alt="" />
                       <button 
                         type="button"
                         onClick={() => removeImage(idx)}
-                        className="absolute inset-0 bg-rose-500/80 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm"
+                        className="absolute inset-0 bg-rose-500/80 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                       >
-                        <Trash2 size={24} />
+                        <Trash2 size={14} />
                       </button>
                     </motion.div>
                   ))}
                 </AnimatePresence>
-                <label className="aspect-square rounded-3xl border-2 border-dashed border-slate-200 hover:border-indigo-600 hover:bg-indigo-50 transition-all flex flex-col items-center justify-center gap-3 cursor-pointer group">
-                  <Upload size={24} className="text-slate-300 group-hover:text-indigo-600 group-hover:scale-110 transition-all" />
-                  <span className="text-[10px] font-black text-slate-400 group-hover:text-indigo-600 uppercase tracking-tighter">Add Photo</span>
+                <label className="w-16 h-16 rounded-lg border-2 border-dashed border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer group">
+                  <Upload size={16} className="text-slate-300 group-hover:text-indigo-500 transition-colors" />
+                  <span className="text-[8px] font-bold text-slate-400 group-hover:text-indigo-600 uppercase">Add</span>
                   <input type="file" multiple onChange={handleImageChange} className="hidden" accept="image/*" />
                 </label>
               </div>
             </div>
 
-            {/* Basic Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Service Title</label>
+            {/* Title + Category — right 3 cols */}
+            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className={labelBase}>Service Title</label>
                 <input 
                   required
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
                   placeholder="e.g. Premium Bathroom Cleaning"
-                  className="w-full bg-slate-50 border-2 border-slate-50 focus:border-indigo-100 focus:bg-white rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 outline-none transition-all shadow-inner"
+                  className={inputBase}
                 />
               </div>
-
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Category</label>
+              <div>
+                <label className={labelBase}>Category</label>
                 <div className="relative">
                   <select
                     required
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
-                    className="w-full appearance-none bg-slate-50 border-2 border-slate-50 focus:border-indigo-100 focus:bg-white rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 outline-none transition-all shadow-inner"
+                    className={`${inputBase} appearance-none pr-8`}
                   >
                     <option value="">Select Category</option>
                     {categories.map(cat => (
                       <option key={cat._id} value={cat._id}>{cat.name}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Pricing & Duration */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 text-emerald-600">Pricing (INR)</label>
-                <div className="relative">
-                  <IndianRupee size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-500" />
-                  <input 
-                    required
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    placeholder="999"
-                    className="w-full bg-emerald-50/30 border-2 border-emerald-50/50 focus:border-emerald-100 focus:bg-white rounded-2xl py-4 pl-12 pr-6 text-sm font-black text-slate-900 outline-none transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 text-indigo-600">Duration (Minutes)</label>
-                <div className="relative">
-                  <Clock size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-indigo-500" />
-                  <input 
-                    required
-                    type="number"
-                    name="duration"
-                    value={formData.duration}
-                    onChange={handleChange}
-                    placeholder="60"
-                    className="w-full bg-indigo-50/30 border-2 border-indigo-50/50 focus:border-indigo-100 focus:bg-white rounded-2xl py-4 pl-12 pr-6 text-sm font-black text-slate-900 outline-none transition-all"
-                  />
-                </div>
+          {/* ROW 2 — Price, Duration, Description in 3 cols */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+            <div>
+              <label className={`${labelBase} !text-emerald-600`}>
+                <span className="flex items-center gap-1"><IndianRupee size={11} /> Pricing (INR)</span>
+              </label>
+              <div className="relative">
+                <IndianRupee size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500" />
+                <input 
+                  required
+                  type="number"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  placeholder="999"
+                  className={`${inputBase} !bg-emerald-50/50 !border-emerald-200 focus:!border-emerald-400 focus:!ring-emerald-100 pl-8`}
+                />
               </div>
             </div>
 
-            {/* Description */}
-            <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Detail Description</label>
+            <div>
+              <label className={`${labelBase} !text-indigo-600`}>
+                <span className="flex items-center gap-1"><Clock size={11} /> Duration (Mins)</span>
+              </label>
+              <div className="relative">
+                <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-500" />
+                <input 
+                  required
+                  type="number"
+                  name="duration"
+                  value={formData.duration}
+                  onChange={handleChange}
+                  placeholder="60"
+                  className={`${inputBase} !bg-indigo-50/50 !border-indigo-200 focus:!border-indigo-400 focus:!ring-indigo-100 pl-8`}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={labelBase}>Description</label>
               <textarea 
                 required
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                rows={4}
-                placeholder="What does this service include? Highlight your expertise..."
-                className="w-full bg-slate-50 border-2 border-slate-50 focus:border-indigo-100 focus:bg-white rounded-3xl py-4 px-6 text-sm font-bold text-slate-900 outline-none transition-all shadow-inner resize-none"
+                rows={1}
+                placeholder="What does this service include?"
+                className={`${inputBase} resize-none`}
+                style={{ minHeight: '38px' }}
+              />
+            </div>
+          </div>
+
+          {/* ROW 3 — Features + Cities + Active Toggle */}
+          <div className="grid grid-cols-1 lg:grid-cols-7 gap-3 items-end">
+            {/* Features — 3 cols */}
+            <div className="lg:col-span-3">
+              <label className={labelBase}>
+                <span className="flex items-center gap-1 text-amber-600"><Tag size={11} /> Features</span>
+              </label>
+              <input 
+                name="features"
+                value={formData.features}
+                onChange={handleChange}
+                placeholder="Eco-friendly, 3-Month Warranty"
+                className={`${inputBase} !bg-amber-50/50 !border-amber-200 focus:!border-amber-400`}
               />
             </div>
 
-            {/* Features & Tags */}
-            <div className="space-y-3 p-8 bg-amber-50/50 rounded-[2.5rem] border border-amber-100">
-              <div className="flex items-center gap-2 mb-2 text-amber-700">
-                <AlertCircle size={14} />
-                <label className="text-[10px] font-black uppercase tracking-widest leading-none">Highlights & Areas</label>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <input 
-                    name="features"
-                    value={formData.features}
-                    onChange={handleChange}
-                    placeholder="Features (comma separated: Eco-friendly, 3-Month Warranty)"
-                    className="w-full bg-white/60 border border-amber-100 focus:border-amber-300 rounded-xl py-3 px-5 text-xs font-bold text-slate-700 outline-none transition-all"
-                  />
-                </div>
-                <div>
-                  <input 
-                    name="cities"
-                    value={formData.cities}
-                    onChange={handleChange}
-                    placeholder="Operation Cities (comma separated: Kolkata, Delhi)"
-                    className="w-full bg-white/60 border border-amber-100 focus:border-amber-300 rounded-xl py-3 px-5 text-xs font-bold text-slate-700 outline-none transition-all"
-                  />
-                </div>
-              </div>
+            {/* Cities — 3 cols */}
+            <div className="lg:col-span-3">
+              <label className={labelBase}>
+                <span className="flex items-center gap-1 text-violet-600"><MapPin size={11} /> Operation Cities</span>
+              </label>
+              <input 
+                name="cities"
+                value={formData.cities}
+                onChange={handleChange}
+                placeholder="Kolkata, Delhi, Mumbai"
+                className={`${inputBase} !bg-violet-50/50 !border-violet-200 focus:!border-violet-400`}
+              />
             </div>
 
-            {/* Active Toggle */}
-            <div className="flex items-center justify-between p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100">
-              <div>
-                <h4 className="text-sm font-black text-slate-900 tracking-tight">Active Status</h4>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Pause or resume this service listing</p>
-              </div>
+            {/* Active Toggle — 1 col */}
+            <div className="lg:col-span-1 flex flex-col items-center">
+              <label className={`${labelBase} text-center`}>Active</label>
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
-                className={`w-16 h-8 rounded-full pr-1 pl-1 transition-all duration-300 flex items-center ${
-                  formData.isActive ? "bg-indigo-600 justify-end" : "bg-slate-200 justify-start"
+                className={`w-12 h-7 rounded-full px-0.5 transition-all duration-300 flex items-center ${
+                  formData.isActive ? "bg-indigo-600 justify-end" : "bg-slate-300 justify-start"
                 }`}
               >
                 <motion.div 
                   layout
-                  className="w-6 h-6 bg-white rounded-full shadow-lg" 
+                  className="w-5 h-5 bg-white rounded-full shadow-md" 
                 />
               </button>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
 
-        {/* Footer */}
-        <div className="p-10 border-t border-slate-100 flex gap-4">
+        {/* ── Footer ── */}
+        <div className="px-5 py-3 border-t border-slate-100 flex gap-3 bg-slate-50 shrink-0">
           <button 
             type="button"
             onClick={onClose}
-            className="flex-1 py-4 bg-slate-100 text-slate-500 rounded-2xl font-black text-sm hover:bg-slate-200 transition-all uppercase tracking-widest"
+            className="flex-1 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg font-semibold text-sm hover:bg-slate-100 transition-all"
           >
             Discard
           </button>
           <button 
             form="serviceForm"
             disabled={submitting}
-            className="flex-[2] py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-100 hover:bg-slate-900 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-widest"
+            className="flex-[2] py-2.5 bg-indigo-600 text-white rounded-lg font-semibold text-sm shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {submitting ? (
               <>
-                <Loader2 size={18} className="animate-spin" />
+                <Loader2 size={15} className="animate-spin" />
                 Publishing...
               </>
             ) : (
               <>
-                <CheckCircle2 size={18} />
+                <CheckCircle2 size={15} />
                 {service ? "Save Changes" : "Create Listing"}
               </>
             )}

@@ -10,8 +10,8 @@ const stats = [
 const StatsSection = () => {
   return (
     <section className="relative z-20 px-6">
-      <div className="max-w-6xl mx-auto -mt-20">
-        <div className="grid grid-cols-2 md:grid-cols-4 bg-white dark:bg-slate-800/90 dark:backdrop-blur-xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] dark:shadow-none rounded-[3rem] p-4 border border-slate-100 dark:border-slate-700 transition-colors duration-300">
+      <div className="max-w-6xl mx-auto -mt-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 bg-white dark:bg-slate-800/90 dark:backdrop-blur-xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] dark:shadow-none rounded-[2rem] p-3 border border-slate-100 dark:border-slate-700 transition-colors duration-300">
           {stats.map((s, i) => (
             <motion.div
               key={i}

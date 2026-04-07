@@ -6,7 +6,7 @@ import api from "@/utils/api";
 const WithdrawalModal = ({ isOpen, onClose, balance, onSuccess }) => {
   const [amount, setAmount] = useState("");
   const [bankDetails, setBankDetails] = useState({
-    accountHolder: "",
+    accountHolderName: "",
     accountNumber: "",
     ifscCode: "",
     bankName: "",
@@ -111,9 +111,9 @@ const WithdrawalModal = ({ isOpen, onClose, balance, onSuccess }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <input 
                     required
-                    name="accountHolder"
+                    name="accountHolderName"
                     placeholder="Acc. Holder Name"
-                    value={bankDetails.accountHolder}
+                    value={bankDetails.accountHolderName}
                     onChange={handleBankChange}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl py-4 px-5 text-xs font-bold text-slate-900 outline-none transition-all"
                   />

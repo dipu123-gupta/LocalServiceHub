@@ -10,7 +10,7 @@ const HeroSection = ({
   setLocalCity,
 }) => {
   return (
-    <section className="relative pt-20 pb-24 lg:pt-32 lg:pb-40 overflow-hidden bg-[#0A0C10]">
+    <section className="relative pt-16 pb-20 lg:pt-24 lg:pb-28 overflow-hidden bg-[#0A0C10]">
       {/* Dynamic Background Mesh */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-20%] right-[-10%] w-[70%] h-[70%] rounded-full bg-indigo-600/20 blur-[130px] animate-pulse" />
@@ -37,7 +37,7 @@ const HeroSection = ({
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-[1.05] tracking-tight mb-8"
+              className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.08] tracking-tight mb-6"
             >
               Expert Care. <br />
               <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
@@ -49,7 +49,7 @@ const HeroSection = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="max-w-xl mb-12 text-lg sm:text-xl text-slate-400 font-medium leading-relaxed"
+              className="max-w-xl mb-8 text-base sm:text-lg text-slate-400 font-medium leading-relaxed"
             >
               Elevate your home experience with India's most trusted professionals. 
               Precision, safety, and excellence—delivered to your doorstep.
@@ -66,7 +66,7 @@ const HeroSection = ({
               <div className="flex-1 flex items-center px-6 py-4 rounded-[1.5rem] bg-white/5 sm:bg-transparent mb-2 sm:mb-0">
                 <MapPin size={20} className="text-indigo-400 mr-3 shrink-0" />
                 <div className="flex flex-col text-left">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Location</span>
+                  <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Location</span>
                   <input
                     placeholder="E.g. Delhi, Mumbai"
                     value={localCity}
@@ -82,7 +82,7 @@ const HeroSection = ({
               <div className="flex-[1.5] flex items-center px-6 py-4 rounded-[1.5rem] bg-white/5 sm:bg-transparent mb-4 sm:mb-0">
                 <Search size={20} className="text-indigo-400 mr-3 shrink-0" />
                 <div className="flex flex-col text-left">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Service</span>
+                  <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Service</span>
                   <input
                     placeholder="What do you need?"
                     value={searchQuery}
@@ -105,14 +105,14 @@ const HeroSection = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.9 }}
-              className="flex flex-wrap gap-3 mt-8"
+              className="flex flex-wrap gap-3 mt-6"
             >
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 self-center">Trending:</span>
+              <span className="text-xs font-black uppercase tracking-widest text-slate-600 self-center">Trending:</span>
               {["Painting", "AC Repair", "Cleaning", "Plumbing"].map((chip) => (
                 <button
                   key={chip}
                   onClick={() => setSearchQuery(chip)}
-                  className="px-4 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-[10px] font-bold text-slate-400 transition-all hover:text-indigo-400 hover:border-indigo-500/30"
+                  className="px-4 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-bold text-slate-400 transition-all hover:text-indigo-400 hover:border-indigo-500/30"
                 >
                   {chip}
                 </button>
@@ -189,7 +189,7 @@ const HeroSection = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.2 }}
-          className="mt-24 sm:mt-32 pt-12 border-t border-white/5 flex flex-wrap justify-between items-center gap-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-700"
+          className="mt-16 sm:mt-20 pt-10 border-t border-white/5 flex flex-wrap justify-between items-center gap-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-700"
         >
           <span className="text-xs font-black uppercase tracking-[0.4em] text-slate-500">Trusted Partners</span>
           <div className="flex flex-wrap gap-12 sm:gap-20 items-center">

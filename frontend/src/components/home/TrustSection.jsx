@@ -35,7 +35,7 @@ const TrustSection = () => {
   ];
 
   return (
-    <section className="py-32 px-6 bg-white dark:bg-slate-950 transition-colors duration-300 relative overflow-hidden">
+    <section className="py-20 px-6 bg-white dark:bg-slate-950 transition-colors duration-300 relative overflow-hidden">
       {/* Decorative Accents */}
       <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
@@ -51,11 +51,11 @@ const TrustSection = () => {
             <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 rounded-full border border-emerald-100 dark:border-emerald-900/50">
               <ShieldCheck size={12} /> Uncompromising Safety
             </div>
-            <h2 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight mb-8">
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight mb-6">
               Why 50,000+ <br />
               <span className="text-indigo-600 dark:text-indigo-400">Users Trust Us</span>
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 text-lg font-medium leading-relaxed mb-10 max-w-lg">
+            <p className="text-slate-500 dark:text-slate-400 text-base font-medium leading-relaxed mb-8 max-w-lg">
               We've built a world-class ecosystem focused on quality, transparency, and 
               your peace of mind. Every service is a commitment to excellence.
             </p>

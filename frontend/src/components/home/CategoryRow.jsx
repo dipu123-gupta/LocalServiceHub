@@ -18,13 +18,13 @@ const CategoryRow = ({ category, services }) => {
   if (!services || services.length === 0) return null;
 
   return (
-    <div className="py-12 border-b border-slate-100 dark:border-slate-800 last:border-0 transition-colors duration-300">
-      <div className="flex items-center justify-between mb-8 px-2 md:px-0">
+    <div className="py-8 border-b border-slate-100 dark:border-slate-800 last:border-0 transition-colors duration-300">
+      <div className="flex items-center justify-between mb-6 px-2 md:px-0">
         <div>
           <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
             {category.name}
           </h3>
-          <p className="text-slate-400 dark:text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-1">
+          <p className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider mt-1">
             Explore top rated {category.name} services
           </p>
         </div>

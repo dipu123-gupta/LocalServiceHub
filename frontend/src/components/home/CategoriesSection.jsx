@@ -28,15 +28,15 @@ const CategoriesSection = ({ categories, isLoading }) => {
   const getIcon = (name) => iconMap[name] || "🛠️";
 
   return (
-    <section className="py-24 px-6 bg-white dark:bg-slate-900 overflow-hidden transition-colors duration-300">
+    <section className="py-16 px-6 bg-white dark:bg-slate-900 overflow-hidden transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-6">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-6">
           <div className="text-center md:text-left">
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
                viewport={{ once: true }}
-              className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight uppercase"
+              className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight uppercase"
             >
               Choose a <span className="text-indigo-600 dark:text-indigo-400">Category</span>
             </motion.h2>
@@ -45,7 +45,7 @@ const CategoriesSection = ({ categories, isLoading }) => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
                transition={{ delay: 0.1 }}
-              className="text-slate-500 dark:text-slate-400 mt-4 text-[10px] font-black uppercase tracking-[0.2em]"
+              className="text-xs font-bold text-slate-500 dark:text-slate-400 mt-3 uppercase tracking-[0.15em]"
             >
               Explore our professional specialized service categories
             </motion.p>
@@ -113,7 +113,7 @@ const CategoriesSection = ({ categories, isLoading }) => {
                       >
                         {cat.icon || getIcon(cat.name)}
                       </div>
-                      <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
+                      <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
                         {cat.name}
                       </span>
                     </div>

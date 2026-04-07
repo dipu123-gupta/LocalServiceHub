@@ -49,6 +49,9 @@ const Home = () => {
         if (uLng) queryParams.lng = uLng;
 
         // Fetch categories and services in parallel
+        // Fetch a high limit so all category rows get populated
+        queryParams.limit = 100;
+
         const [categoriesData, servicesData] = await Promise.all([
           serviceService.getCategories(),
           serviceService.getServices(queryParams),
@@ -84,7 +87,7 @@ const Home = () => {
       {/* <HowItWorks /> */}
       <CategoriesSection categories={categories} isLoading={isLoading} />
       
-      <section className="py-24 px-6 max-w-7xl mx-auto">
+      <section className="py-12 px-6 max-w-7xl mx-auto">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <Loader2 className="w-12 h-12 text-indigo-600 animate-spin" />

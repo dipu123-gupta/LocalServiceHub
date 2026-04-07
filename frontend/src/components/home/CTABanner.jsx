@@ -5,7 +5,7 @@ import { ArrowRight, Briefcase } from "lucide-react";
 
 const CTABanner = () => {
   return (
-    <section className="relative bg-[#0A0C10] py-32 px-6 overflow-hidden">
+    <section className="relative bg-[#0A0C10] py-20 px-6 overflow-hidden">
       {/* Background Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-40">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-600/20 blur-[100px]" />
@@ -27,7 +27,7 @@ const CTABanner = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
-          className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight leading-[1.1]"
+          className="text-3xl md:text-5xl font-black text-white mb-5 tracking-tight leading-[1.1]"
         >
           Are you a service <span className="text-indigo-500 underline decoration-indigo-500/30 underline-offset-8 italic">professional?</span>
         </motion.h2>
@@ -37,7 +37,7 @@ const CTABanner = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="text-slate-400 text-lg md:text-xl font-medium mb-12 max-w-2xl mx-auto leading-relaxed"
+          className="text-slate-400 text-base md:text-lg font-medium mb-10 max-w-2xl mx-auto leading-relaxed"
         >
           Join 2,000+ verified experts on HomeServiceHub. Scale your business, manage bookings, and delight customers every day.
         </motion.p>
