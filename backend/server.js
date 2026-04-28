@@ -53,6 +53,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
   "https://localservicehub-frontend.onrender.com",
+  "https://localservicehub-7f9q.onrender.com",
+  process.env.FRONTEND_URL,
 ];
 
 // Socket.io setup

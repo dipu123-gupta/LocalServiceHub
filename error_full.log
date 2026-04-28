@@ -1,0 +1,8 @@
+file:///D:/GitHub/HomeServiceHub/backend/controllers/authController.js:5
+import otplib from "otplib";
+       ^^^^^^
+SyntaxError: The requested module 'otplib' does not provide an export named 'default'
+    at #asyncInstantiate (node:internal/modules/esm/module_job:302:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:405:5)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26)
+    at async run (file:///D:/GitHub/HomeServiceHub/final_check.js:8:5)
